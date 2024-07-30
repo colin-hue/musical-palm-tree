@@ -11,128 +11,128 @@
     <body>
     <style>
         :root{
-    --fsize: 15px;
-    --pdding: 3px;
-    --fnt-family: 'Arial';
-}
+            --fsize: 15px;
+            --pdding: 3px;
+            --fnt-family: 'Arial';
+        }
 
-html,
-.fullscreen {
-    display: flex;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-}
+        html,
+        .fullscreen {
+            display: flex;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
   
-/* Center the content in the browser window */
-.container {
-    margin: auto;
-    text-align: center;
-}
+        /* Center the content in the browser window */
+        .container {
+            margin: auto;
+            text-align: center;
+        }
   
-.title {
-    font-size: 3rem;
-}
+        .title {
+            font-size: 3rem;
+        }
 
+        /* Ripple effect */
+        .ripple {
+            background-position: center;
+            transition: background 0.8s;
+        }
+        .ripple:hover {
+            background: #47a7f5 radial-gradient(circle, transparent 1%, #47a7f5 1%) center/15000%;
+        }
+        .ripple:active {
+            background-color: #6eb9f7;
+            background-size: 100%;
+            transition: background 0s;
+        }
 
-/* Ripple effect */
-.ripple {
-    background-position: center;
-    transition: background 0.8s;
-}
-.ripple:hover {
-    background: #47a7f5 radial-gradient(circle, transparent 1%, #47a7f5 1%) center/15000%;
-}
-.ripple:active {
-    background-color: #6eb9f7;
-    background-size: 100%;
-    transition: background 0s;
-}
+        /* Button style */
+        button {
+            border: none;
+            border-radius: 2px;
+            padding: 12px 18px;
+            font-size: 16px;
+            text-transform: uppercase;
+            cursor: pointer;
+            color: white;
+            background-color: #2196f3;
+            box-shadow: 0 0 4px #999;
+            outline: none;
+            width:100%;
+        }
+        input[type=out] {
+            border              : none;
+            font-family: var(--fnt-family);
+            font-size: var(--fsize);
+        }
+        input[type=out]:focus {
+            border              : none;
+            outline             : none;
+            font-family: var(--fnt-family);
+        }
+        input[type=in] {
+            font-family: var(--fnt-family);
+            font-size: var(--fsize);
+        }
+        body {
+            color: rgb(0, 0, 0);
+            font-family: var(--fnt-family);
+            font-size: var(--fsize);
+        }
+        @media (min-width: 1000) {
+            .grid-outline {
+                display:grid;
+                grid-template-areas:
+                    'button'
+                    'form';
+            }
+            .grid-outline > div {
+                /*background-color: rgba(255, 255, 255, 0.8);*/
+                background-color: rgba(250, 10, 10, 0.8);
+                text-align: center;
+                padding: var(--pdding);
+            }
+            .grid-container {
+                display: grid;
+                grid-template-columns: auto auto;
+            }
 
-/* Button style */
-button {
-    border: none;
-    border-radius: 2px;
-    padding: 12px 18px;
-    font-size: 16px;
-    text-transform: uppercase;
-    cursor: pointer;
-    color: white;
-    background-color: #2196f3;
-    box-shadow: 0 0 4px #999;
-    outline: none;
-}
-input[type=out] {
-    border              : none;
-    font-family: var(--fnt-family);
-    font-size: var(--fsize);
-}
-input[type=out]:focus {
-    border              : none;
-    outline             : none;
-    font-family: var(--fnt-family);
-}
-input[type=in] {
-    font-family: var(--fnt-family);
-    font-size: var(--fsize);
-}
-body {
-    color: rgb(0, 0, 0);
-    font-family: var(--fnt-family);
-    font-size: var(--fsize);
-}
-@media (min-width: 1000) {
-    .grid-outline {
-        display:grid;
-        grid-template-areas:
-            'button'
-            'form';
-    }
-    .grid-outline > div {
-        /*background-color: rgba(255, 255, 255, 0.8);*/
-        background-color: rgba(250, 10, 10, 0.8);
-        text-align: center;
-        padding: var(--pdding);
-    }
-    .grid-container {
-        display: grid;
-        grid-template-columns: auto auto;
-    }
-
-    .grid-container > div {
-        /*background-color: rgba(255, 255, 255, 0.8);*/
-        background-color: rgba(250, 10, 10, 0.8);
-        text-align: center;
-        font-size: var(--fsize);
-        padding: var(--pdding);
-    }
-}
-@media (max-width: 600) {
-    .grid-outline {
-        display:grid;
-        grid-template-areas:
-            'button'
-            'form';
-    }
-    .grid-outline > div {
-        background-color: rgba(12, 211, 247, 0.8);
-        color: rgba(12, 211, 247, 0.8);
-        text-align: center;
-        padding: var(--pdding);
-    }
-    .grid-container {
-        display: grid;
-        grid-template-columns: auto;
-    }
-    .grid-container > div {
-        background-color: rgba(12, 211, 247, 0.8);
-        color: rgba(12, 211, 247, 0.8);
-        text-align: center;
-        font-size: var(--fsize);
-        padding: var(--pdding);
-    }
-}
+            .grid-container > div {
+                /*background-color: rgba(255, 255, 255, 0.8);*/
+                background-color: rgba(250, 10, 10, 0.8);
+                text-align: center;
+                font-size: var(--fsize);
+                padding: var(--pdding);
+            }
+        }
+        @media (max-width: 600) {
+            .grid-outline {
+                display:grid;
+                grid-template-areas:
+                    'button'
+                    'form';
+            }
+            .grid-outline > div {
+                background-color: rgba(12, 211, 247, 0.8);
+                color: rgba(12, 211, 247, 0.8);
+                text-align: center;
+                padding: var(--pdding);
+            }
+            .grid-container {
+                display: grid;
+                grid-template-columns: auto;
+            }
+            .grid-container > div {
+                background-color: rgba(12, 211, 247, 0.8);
+                color: rgba(12, 211, 247, 0.8);
+                text-align: center;
+                font-size: var(--fsize);
+                padding: var(--pdding);
+            }
+        }
 
     </style>
         <script src="js/appcode.js"></script>
