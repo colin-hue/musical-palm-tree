@@ -70,7 +70,7 @@ body {
     font-family: var(-fnt-family);
     font-size: var(--fsize);
 }
-@media (max-width: 1700px) {
+@media (min-width: 301px) {
     .grid-outline {
         display:grid;
         grid-template-areas:
