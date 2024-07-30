@@ -99,6 +99,9 @@
             font-size: var(--fsize);
             padding: var(--pdding);
         }
+        .Label {
+                width:100%;
+        }
         @media (min-width: 768px) {
             .grid-outline {
                 display:grid;
@@ -123,6 +126,26 @@
                 text-align: center;
                 font-size: var(--fsize);
                 padding: var(--pdding);
+            }
+            input[type=out] {
+                border              : none;
+                font-family: var(--fnt-family);
+                font-size: var(--fsize);
+                width:50%;
+            }
+            input[type=out]:focus {
+                border              : none;
+                outline             : none;
+                font-family: var(--fnt-family);
+                width:50%;
+             }
+            input[type=in] {
+                font-family: var(--fnt-family);
+                font-size: var(--fsize);
+                width:50%;
+            }
+            .Label {
+                width:50%;            
             }
         }
     </style>
