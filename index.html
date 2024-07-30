@@ -25,16 +25,6 @@
             width: 100%;
         }
   
-        /* Center the content in the browser window */
-        .container {
-            margin: auto;
-            text-align: center;
-        }
-  
-        .title {
-            font-size: 3rem;
-        }
-
         /* Ripple effect */
         .ripple {
             background-position: center;
@@ -67,22 +57,49 @@
             border              : none;
             font-family: var(--fnt-family);
             font-size: var(--fsize);
+            width:100%;
         }
         input[type=out]:focus {
             border              : none;
             outline             : none;
             font-family: var(--fnt-family);
+            width:100%;
         }
         input[type=in] {
             font-family: var(--fnt-family);
             font-size: var(--fsize);
+            width:100%;
         }
         body {
             color: rgb(0, 0, 0);
             font-family: var(--fnt-family);
             font-size: var(--fsize);
+            width:100%;
         }
-        @media (min-width: 1000) {
+        .grid-outline {
+            display:grid;
+            grid-template-areas:
+                'button'
+                'form';
+        }
+        .grid-outline > div {
+            background-color: rgba(12, 211, 247, 0.8);
+            color: rgba(12, 211, 247, 0.8);
+            text-align: center;
+            padding: var(--pdding);
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: auto;
+        }
+        .grid-container > div {
+            background-color: rgba(12, 211, 247, 0.8);
+            color: rgba(12, 211, 247, 0.8);
+            text-align: center;
+            font-size: var(--fsize);
+            padding: var(--pdding);
+        }
+        @media (min-width: 768px) {
             .grid-outline {
                 display:grid;
                 grid-template-areas:
@@ -108,32 +125,6 @@
                 padding: var(--pdding);
             }
         }
-        @media (max-width: 600) {
-            .grid-outline {
-                display:grid;
-                grid-template-areas:
-                    'button'
-                    'form';
-            }
-            .grid-outline > div {
-                background-color: rgba(12, 211, 247, 0.8);
-                color: rgba(12, 211, 247, 0.8);
-                text-align: center;
-                padding: var(--pdding);
-            }
-            .grid-container {
-                display: grid;
-                grid-template-columns: auto;
-            }
-            .grid-container > div {
-                background-color: rgba(12, 211, 247, 0.8);
-                color: rgba(12, 211, 247, 0.8);
-                text-align: center;
-                font-size: var(--fsize);
-                padding: var(--pdding);
-            }
-        }
-
     </style>
         <script src="js/appcode.js"></script>
         <div class="grid-outline">
