@@ -111,7 +111,7 @@ body {
         grid-template-columns: auto;
     }
     .grid-container > div {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(12, 211, 247, 0.8);
         text-align: center;
         font-size: var(--fsize);
         padding: var(--pdding);
