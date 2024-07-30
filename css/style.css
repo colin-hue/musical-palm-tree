@@ -1,0 +1,119 @@
+:root{
+    --fsize: 30px;
+    --pdding: 3px;
+    --fnt-family: 'Arial';
+}
+
+html,
+.fullscreen {
+    display: flex;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+  
+/* Center the content in the browser window */
+.container {
+    margin: auto;
+    text-align: center;
+}
+  
+.title {
+    font-size: 3rem;
+}
+
+
+/* Ripple effect */
+.ripple {
+    background-position: center;
+    transition: background 0.8s;
+}
+.ripple:hover {
+    background: #47a7f5 radial-gradient(circle, transparent 1%, #47a7f5 1%) center/15000%;
+}
+.ripple:active {
+    background-color: #6eb9f7;
+    background-size: 100%;
+    transition: background 0s;
+}
+
+/* Button style */
+button {
+    border: none;
+    border-radius: 2px;
+    padding: 12px 18px;
+    font-size: 16px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: white;
+    background-color: #2196f3;
+    box-shadow: 0 0 4px #999;
+    outline: none;
+}
+input[type=out] {
+    border              : none;
+    font-family: var(-fnt-family);
+    font-size: var(--fsize);
+}
+input[type=out]:focus {
+    border              : none;
+    outline             : none;
+    font-family: var(-fnt-family);
+}
+input[type=in] {
+    font-family: var(-fnt-family);
+    font-size: var(--fsize);
+}
+body {
+    color: rgb(0, 0, 0);
+    font-family: var(-fnt-family);
+    font-size: var(--fsize);
+}
+@media only screen and (max-width: 1700px) {
+    .grid-outline {
+        display:grid;
+        grid-template-areas:
+            'button'
+            'form';
+    }
+    .grid-outline > div {
+        background-color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        padding: var(--pdding);
+    }
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto auto;
+    }
+
+    .grid-container > div {
+        background-color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        font-size: var(--fsize);
+        padding: var(--pdding);
+    }
+}
+@media only screen and (max-width: 300px) {
+    .grid-outline {
+        display:grid;
+        grid-template-areas:
+            'button'
+            'form';
+    }
+    .grid-outline > div {
+        background-color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        padding: var(--pdding);
+    }
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto;
+    }
+    .grid-container > div {
+        background-color: rgba(255, 255, 255, 0.8);
+        text-align: center;
+        font-size: var(--fsize);
+        padding: var(--pdding);
+    }
+}

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta content="text/html">
+        <meta http-equiv="Content-Type">
+        <meta charset="utf-8">
+        <title>My Monthly Budget Calculator</title>
+        <link rel="stylesheet" href="css/style.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <script src="js/appcode.js"></script>
+        <div class="grid-outline">
+            <div class="Item0">
+                <button class="ripple" id="Execute" onclick="Calculate()">
+                    Calculate
+                </button>
+            </div>
+            <div class="grid-container">
+                <div class="Label">
+                    Notional Salary
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="notional_salary" onchange="Calculate()" type="in" value="4500">
+                </div>
+                <div class="Label">
+                    Pension Reduction
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="pension_reduction" onchange="Calculate()" type="in" value="-1100">
+                </div>
+                <div class="Label">
+                    Expected Monthly Salary
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="expected_monthly_salary" onchange="Calculate()" type="in" value="3455">
+                </div>
+                <div class="Label">
+                    Previous Months Surplus
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="previous_months_surplus" onchange="Calculate()" type="in" value="5900">
+                </div>
+                <div class="Label">
+                    End Of Previous Month Balance
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="end_of_previous_month_balance" onchange="Calculate()" type="in" value="70000">
+                </div>
+                <div class="Label">
+                    Salary Input
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="salary_input" onchange="Calculate()" type="in" value="3455">
+                </div>
+                <div class="Label">
+                    Unallocated Bonus
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="unallocated_bonus" onchange="Calculate()" type="in" value="23000">
+                </div>
+                <div class="Label">
+                    Allocated Bonus
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="allocated_bonus" onchange="Calculate()" type="in" value="26000">
+                </div>
+                <div class="Label">
+                    Allocated Bonus Spending
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="allocated_bonus_spending" onchange="Calculate()" type="in" value="1000">
+                </div>
+                <div class="Label">
+                    Inheritence
+                </div>
+                <div class="InputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="inheritence" onchange="Calculate()" type="in" value="12000">
+                </div>
+                <div class="Label">
+                    Extra Unallocated Bonus
+                </div>
+                <div class="OutputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="extra_unallocated_bonus" readonly type="out">
+                </div>
+                <div class="Label">
+                    New Unallocated Bonus
+                </div>
+                <div class="OutputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="new_unallocated_bonus" readonly type="out">
+                </div>
+                <div class="Label">
+                    New Allocated Bonus
+                </div>
+                <div class="OutputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="new_allocated_bonus" readonly type="out">
+                </div>
+                <div class="Label">
+                    New Inheritence
+                </div>
+                <div class="OutputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="new_inheritence" readonly type="out">
+                </div>
+                <div class="Label">
+                    Surplus
+                </div>
+                <div class="OutputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="surplus" readonly type="out">
+                </div>
+                <div class="Label">
+                    Variance
+                </div>
+                <div class="OutputField">
+                    &pound;&nbsp;&nbsp;
+                    <input id="variance" readonly type="out">
+                </div>
+            </div>
+        </div>
+        <script>
+            ConditionalFormatting();
+           //alert(window.screen.availWidth);
+        </script>
+        <script src="js/main.js"></script>
+    </body>
+</html>
+

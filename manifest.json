@@ -1,0 +1,9 @@
+{
+    "name": "My Monthly Calculator",
+    "short_name": "Calculate",
+    "lang": "en-UK",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "white",
+    "theme_color": "white"
+  }
