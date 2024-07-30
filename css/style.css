@@ -70,7 +70,7 @@ body {
     font-family: var(-fnt-family);
     font-size: var(--fsize);
 }
-@media only screen and (max-width: 1700px) {
+@media (max-width: 1700px) {
     .grid-outline {
         display:grid;
         grid-template-areas:
@@ -94,7 +94,7 @@ body {
         padding: var(--pdding);
     }
 }
-@media only screen and (max-width: 300px) {
+@media (max-width: 300px) {
     .grid-outline {
         display:grid;
         grid-template-areas:
