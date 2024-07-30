@@ -102,7 +102,7 @@ body {
             'form';
     }
     .grid-outline > div {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(12, 211, 247, 0.8);
         text-align: center;
         padding: var(--pdding);
     }
