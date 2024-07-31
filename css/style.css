@@ -12,17 +12,6 @@ html,
     padding: 0;
     width: 100%;
 }
-  
-/* Center the content in the browser window */
-.container {
-    margin: auto;
-    text-align: center;
-}
-  
-.title {
-    font-size: 3rem;
-}
-
 
 /* Ripple effect */
 .ripple {
@@ -50,76 +39,74 @@ button {
     background-color: #2196f3;
     box-shadow: 0 0 4px #999;
     outline: none;
+    width:100%;
 }
 input[type=out] {
     border              : none;
-    font-family: var(-fnt-family);
+    font-family: var(--fnt-family);
     font-size: var(--fsize);
 }
 input[type=out]:focus {
     border              : none;
     outline             : none;
-    font-family: var(-fnt-family);
+    font-family: var(--fnt-family);
 }
 input[type=in] {
-    font-family: var(-fnt-family);
+    font-family: var(--fnt-family);
     font-size: var(--fsize);
 }
 body {
     color: rgb(0, 0, 0);
-    font-family: var(-fnt-family);
+    font-family: var(--fnt-family);
     font-size: var(--fsize);
+    margin-left:auto;
+    margin-right:auto;
+    text-align: center;
 }
-/*@media (min-width: 301px) {*/
-    .grid-outline {
-        display:grid;
-        grid-template-areas:
-            'button'
-            'form';
-    }
-    .grid-outline > div {
-        /*background-color: rgba(255, 255, 255, 0.8);*/
-        background-color: rgba(250, 10, 10, 0.8);
-        color: rgba(250, 10, 10, 0.8);
-        text-align: center;
-        padding: var(--pdding);
-    }
+.grid-outline {
+    display:grid;
+    grid-template-areas:
+        'button'
+        'form';
+}
+.grid-outline > div {
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    width:100%;
+    padding: var(--pdding);
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: auto;
+}
+.grid-container > div {
+    background-color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    width:100%;
+    font-size: var(--fsize);
+    padding: var(--pdding);
+}
+.Label {
+    width:100%;
+}
+.InputField {
+    width:100%;
+ }
+.OutputField {
+    width:100%;
+ }
+@media (min-width: 768px) {
     .grid-container {
         display: grid;
         grid-template-columns: auto auto;
     }
-
-    .grid-container > div {
-        /*background-color: rgba(255, 255, 255, 0.8);*/
-        background-color: rgba(250, 10, 10, 0.8);
-        color: rgba(250, 10, 10, 0.8);
-        text-align: center;
-        font-size: var(--fsize);
-        padding: var(--pdding);
+    .Label {
+        width:25%;            
     }
-/*}*/
-@media (max-width: 300px) {
-    .grid-outline {
-        display:grid;
-        grid-template-areas:
-            'button'
-            'form';
+    .InputField {
+        width:75%;
     }
-    .grid-outline > div {
-        background-color: rgba(12, 211, 247, 0.8);
-        color: rgba(12, 211, 247, 0.8);
-        text-align: center;
-        padding: var(--pdding);
-    }
-    .grid-container {
-        display: grid;
-        grid-template-columns: auto;
-    }
-    .grid-container > div {
-        background-color: rgba(12, 211, 247, 0.8);
-        color: rgba(12, 211, 247, 0.8);
-        text-align: center;
-        font-size: var(--fsize);
-        padding: var(--pdding);
+    .OutputField {
+        width:75%;
     }
 }
