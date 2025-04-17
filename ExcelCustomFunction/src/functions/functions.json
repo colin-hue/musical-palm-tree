@@ -1,0 +1,78 @@
+{
+    "allowCustomDataForDataTypeAny": true,
+    "allowErrorForDataTypeAny": true,
+    "functions": [
+      {
+        "id": "ADD",
+        "name": "ADD",
+        "description": "Add two numbers",
+        "helpUrl": "http://www.contoso.com/help",
+        "result": {
+          "type": "number",
+          "dimensionality": "scalar"
+        },
+        "parameters": [
+          {
+            "name": "first",
+            "description": "first number to add",
+            "type": "number",
+            "dimensionality": "scalar"
+          },
+          {
+            "name": "second",
+            "description": "second number to add",
+            "type": "number",
+            "dimensionality": "scalar"
+          }
+        ]
+      },
+      {
+        "id": "GETDAY",
+        "name": "GETDAY",
+        "description": "Get the day of the week",
+        "helpUrl": "http://www.contoso.com/help",
+        "result": {
+          "dimensionality": "scalar"
+        },
+        "parameters": []
+      },
+      {
+        "id": "INCREMENTVALUE",
+        "name": "INCREMENTVALUE",
+        "description": "Count up from zero",
+        "helpUrl": "http://www.contoso.com/help",
+        "result": {
+          "dimensionality": "scalar"
+        },
+        "parameters": [
+          {
+            "name": "increment",
+            "description": "the number to be added each time",
+            "type": "number",
+            "dimensionality": "scalar"
+          }
+        ],
+        "options": {
+          "stream": true,
+          "cancelable": true
+        }
+      },
+      {
+        "id": "SECONDHIGHEST",
+        "name": "SECONDHIGHEST",
+        "description": "Get the second highest number from a range",
+        "helpUrl": "http://www.contoso.com/help",
+        "result": {
+          "dimensionality": "scalar"
+        },
+        "parameters": [
+          {
+            "name": "range",
+            "description": "the input range",
+            "type": "number",
+            "dimensionality": "matrix"
+          }
+        ]
+      }
+    ]
+  }

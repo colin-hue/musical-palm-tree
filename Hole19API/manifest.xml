@@ -74,7 +74,7 @@
         <bt:Url id="Taskpane.Url" DefaultValue="https://colin-hue.github.io/musical-palm-tree/Hole19API/Hole19Addin.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="Get started with the Hole 19 API add-in!"/>
+        <bt:String id="GetStarted.Title" DefaultValue="Get started with the Hello world add-in!"/>
         <bt:String id="CommandsGroup.Label" DefaultValue="Hole-19 Add-in"/>
         <bt:String id="TaskpaneButton.Label" DefaultValue="Import Data"/>
         <bt:String id="TaskpaneButton.SupertipTitle" DefaultValue="Import Data from Hole-19"/>
