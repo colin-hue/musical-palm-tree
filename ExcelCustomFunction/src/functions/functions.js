@@ -9,6 +9,9 @@
  * @returns {number} The sum of the two numbers.
  */
 function add(first, second) {
+  console.info("Hello from add function");
+  console.info(first);
+  console.info(second);
   return first + second;
 }
 
