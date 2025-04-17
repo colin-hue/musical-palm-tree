@@ -60,7 +60,7 @@
       {
         "id": "SECONDHIGHEST",
         "name": "SECONDHIGHEST",
-        "description": "Get the second highest number from a range",
+        "description": "Get the second highest number from a range me",
         "helpUrl": "http://www.contoso.com/help",
         "result": {
           "dimensionality": "scalar"
