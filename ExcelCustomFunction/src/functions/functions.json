@@ -1,78 +1,68 @@
 {
     "allowCustomDataForDataTypeAny": true,
-    "allowErrorForDataTypeAny": true,
     "functions": [
-      {
-        "id": "ADD",
-        "name": "ADD",
-        "description": "Add two numbers",
-        "helpUrl": "http://www.contoso.com/help",
-        "result": {
-          "type": "number",
-          "dimensionality": "scalar"
+        {
+            "description": "Add two numbers",
+            "id": "ADD",
+            "name": "ADD",
+            "parameters": [
+                {
+                    "description": "First number",
+                    "name": "first",
+                    "type": "number"
+                },
+                {
+                    "description": "Second number",
+                    "name": "second",
+                    "type": "number"
+                }
+            ],
+            "result": {
+                "type": "number"
+            }
         },
-        "parameters": [
-          {
-            "name": "first",
-            "description": "first number to add",
-            "type": "number",
-            "dimensionality": "scalar"
-          },
-          {
-            "name": "second",
-            "description": "second number to add",
-            "type": "number",
-            "dimensionality": "scalar"
-          }
-        ]
-      },
-      {
-        "id": "GETDAY",
-        "name": "GETDAY",
-        "description": "Get the day of the week",
-        "helpUrl": "http://www.contoso.com/help",
-        "result": {
-          "dimensionality": "scalar"
+        {
+            "description": "Displays the current time once a second",
+            "id": "CLOCK",
+            "name": "CLOCK",
+            "options": {
+                "stream": true
+            },
+            "parameters": [],
+            "result": {
+                "type": "string"
+            }
         },
-        "parameters": []
-      },
-      {
-        "id": "INCREMENTVALUE",
-        "name": "INCREMENTVALUE",
-        "description": "Count up from zero",
-        "helpUrl": "http://www.contoso.com/help",
-        "result": {
-          "dimensionality": "scalar"
+        {
+            "description": "Increments a value once a second.",
+            "id": "INCREMENT",
+            "name": "INCREMENT",
+            "options": {
+                "stream": true
+            },
+            "parameters": [
+                {
+                    "description": "Amount to increment",
+                    "name": "incrementBy",
+                    "type": "number"
+                }
+            ],
+            "result": {
+                "type": "number"
+            }
         },
-        "parameters": [
-          {
-            "name": "increment",
-            "description": "the number to be added each time",
-            "type": "number",
-            "dimensionality": "scalar"
-          }
-        ],
-        "options": {
-          "stream": true,
-          "cancelable": true
+        {
+            "description": "Writes a message to console.log().",
+            "id": "LOG",
+            "name": "LOG",
+            "parameters": [
+                {
+                    "description": "String to write.",
+                    "name": "message",
+                    "type": "string"
+                }
+            ],
+            "result": {}
         }
-      },
-      {
-        "id": "SECONDHIGHEST",
-        "name": "SECONDHIGHEST",
-        "description": "Get the second highest number from a range me",
-        "helpUrl": "http://www.contoso.com/help",
-        "result": {
-          "dimensionality": "scalar"
-        },
-        "parameters": [
-          {
-            "name": "range",
-            "description": "the input range",
-            "type": "number",
-            "dimensionality": "matrix"
-          }
-        ]
-      }
     ]
-  }
+}
