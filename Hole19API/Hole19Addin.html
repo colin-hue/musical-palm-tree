@@ -4,30 +4,30 @@
     <title>Excel Add-In: Hole19 Data Import</title>
     <!-- Office JavaScript API -->
     <script type="text/javascript" src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://www.hole19.com; script-src 'self'; connect-src 'self' https://www.hole19.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://www.hole19.com; style-src 'self'; script-src 'self'; connect-src 'self' https://www.hole19.com;">
+    <!-- Link to external CSS -->
+    <link rel="stylesheet" type="text/css" href="Hole19Addin.css">
 </head>
-<body style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
-    <div style="background-color: #0078D7; color: white; padding: 10px; display: flex; align-items: center; justify-content: space-between; position: relative;">
-        <div style="display: flex; align-items: center;">
-            <img src="https://colin-hue.github.io/musical-palm-tree/Hole19API/logo-white-49d6467c81954499645cb81d6c5d21721be63a93479a4f9ac46a27717a30fd14.svg" alt="Logo" style="height: 80px; margin-right: 10px;">            <h1 style="margin: 0;">DATA IMPORT</h1>
+<body>
+    <div>
+        <div>
+            <img src="https://colin-hue.github.io/musical-palm-tree/Hole19API/logo-white-49d6467c81954499645cb81d6c5d21721be63a93479a4f9ac46a27717a30fd14.svg" alt="Logo">
+            <h1>DATA IMPORT</h1>
         </div>
     </div>
-    <div id="pane1" style="background-color: white; padding: 20px;">
-        <button id="addNewRound" style="padding: 10px 20px; margin: 10px 0; border: none; background-color: #0078D7; color: white; cursor: pointer; font-size: 16px;" onclick="add_new_round()">Add New Round</button><br>
-        <button id="processHold19" style="padding: 10px 20px; margin: 10px 0; border: none; background-color: #0078D7; color: white; cursor: pointer; font-size: 16px;" onclick="displayHole19ProcessingUI()">Process Hold 19</button>
-        <button id="Test" style="padding: 10px 20px; margin: 10px 0; border: none; background-color: #0078D7; color: white; cursor: pointer; font-size: 16px;" onclick="TestNewFunctionality()">Test New Functionality</button>
-      </div>
-    <div id="pane2" style="background-color: white; padding: 20px; display: none;">
-        <input type="text" id="inputField" placeholder="Enter value" style="margin-bottom: 10px;"><br>
-        <button id="goButton" style="padding: 10px 20px; margin: 10px 0; border: none; background-color: #0078D7; color: white; cursor: pointer; font-size: 16px;" onclick="processHole19EventHandler()">Go</button>
+    <div id="pane1">
+        <button id="addNewRound" onclick="add_new_round()">Add New Round</button><br>
+        <button id="processHold19" onclick="displayHole19ProcessingUI()">Process Hold 19</button>
+        <button id="Test" onclick="TestNewFunctionality()">Test New Functionality</button>
     </div>
-    <div id="pane3" style="background-color: white; padding: 20px; display: none;">
+    <div id="pane2">
+        <input type="text" id="inputField" placeholder="Enter value"><br>
+        <button id="goButton" onclick="processHole19EventHandler()">Go</button>
+    </div>
+    <div id="pane3">
         <p id="resultMessage"></p>
-        <button id="okButton" style="padding: 10px 20px; margin: 10px 0; border: none; background-color: #0078D7; color: white; cursor: pointer; font-size: 16px;" onclick="resetHandler()">OK</button>
+        <button id="okButton" onclick="resetHandler()">OK</button>
     </div>
 </body>
-
-
-<script src=""Hole19AddinScript.js></script>
-
+<script src="Hole19AddinScript.js"></script>
 </html>

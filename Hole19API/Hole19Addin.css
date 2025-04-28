@@ -1,0 +1,57 @@
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header styling */
+div[style*="background-color: #0078D7"] {
+    background-color: #0078D7;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+div[style*="display: flex; align-items: center;"] {
+    display: flex;
+    align-items: center;
+}
+
+img {
+    height: 80px;
+    margin-right: 10px;
+}
+
+h1 {
+    margin: 0;
+}
+
+/* Pane styling */
+#pane1, #pane2, #pane3 {
+    background-color: white;
+    padding: 20px;
+}
+
+#pane2, #pane3 {
+    display: none;
+}
+
+/* Button styling */
+button {
+    padding: 10px 20px;
+    margin: 10px 0;
+    border: none;
+    background-color: #0078D7;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Input field styling */
+input[type="text"] {
+    margin-bottom: 10px;
+}
