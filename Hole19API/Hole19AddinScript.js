@@ -7,11 +7,6 @@ Office.onReady((info) => {
         }
     });
 
-document.getElementById("addNewRound").addEventListener("click", add_new_round);
-document.getElementById("processHold19").addEventListener("click", displayHole19ProcessingUI);
-document.getElementById("Test").addEventListener("click", TestNewFunctionality);
-document.getElementById("goButton").addEventListener("click", processHole19EventHandler);
-document.getElementById("okButton").addEventListener("click", resetHandler);
 
 
 async function file_get_contents(url) {
@@ -274,34 +269,41 @@ async function processHole19EventHandler()
       resultMessage.textContent = "Failure! Unable to process the input value " + inputField.value + ".";
     }
   }
-
-  async function TestNewFunctionality()
-  {
-    console.info("Test New Functionality");
-    const url = "https://www.hole19.com";
-
-    try {
-        console.info("Fetching the home page...");
-        const response = await fetch(url, {
-            method: "GET",
-        });
-
-        if (response.ok) {
-            const text = await response.text(); // Get the response as plain text
-            console.info("Home page downloaded successfully.");
-            console.info("Page content:", text);
-            return text; // Return the page content
-        } else {
-            console.error(`Failed to fetch the home page. Status: ${response.status}`);
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-    } catch (error) {
-        console.error("Error fetching the home page:", error);
-        throw error;
-    }
-    console.info(lastRound, "TestNewFunctionality");
-  }
-
-  pane2.style.display = "none";
-  pane3.style.display = "block";
 }
+
+async function TestNewFunctionality()
+{
+console.info("Test New Functionality");
+const url = "https://www.hole19.com";
+
+try {
+    console.info("Fetching the home page...");
+    const response = await fetch(url, {
+        method: "GET",
+    });
+
+    if (response.ok) {
+        const text = await response.text(); // Get the response as plain text
+        console.info("Home page downloaded successfully.");
+        console.info("Page content:", text);
+        return text; // Return the page content
+    } else {
+        console.error(`Failed to fetch the home page. Status: ${response.status}`);
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+} catch (error) {
+    console.error("Error fetching the home page:", error);
+    throw error;
+}
+console.info(lastRound, "TestNewFunctionality");
+}
+
+pane2.style.display = "none";
+pane3.style.display = "block";
+
+
+document.getElementById("addNewRound").addEventListener("click", add_new_round);
+document.getElementById("processHold19").addEventListener("click", displayHole19ProcessingUI);
+document.getElementById("Test").addEventListener("click", TestNewFunctionality );
+document.getElementById("goButton").addEventListener("click", processHole19EventHandler);
+document.getElementById("okButton").addEventListener("click", resetHandler);
