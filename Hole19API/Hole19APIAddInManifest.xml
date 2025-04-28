@@ -13,8 +13,13 @@
   <HighResolutionIconUrl DefaultValue="https://colin-hue.github.io/musical-palm-tree/Hole19API/hole19-64.png"/>
   <SupportUrl DefaultValue="https://learn.microsoft.com/office/dev/add-ins/overview/office-add-in-code-samples"/>
   <AppDomains>
-    <AppDomain>https://colin-hue.github.io</AppDomain>
+    <AppDomain>https://www.hole19.com</AppDomain>
   </AppDomains>
+  <Resources>
+    <Resource>
+      <Url>https://www.hole19.com/*</Url>
+    </Resource>
+  </Resources>
   <Hosts>
     <Host Name="Workbook"/>
   </Hosts>
