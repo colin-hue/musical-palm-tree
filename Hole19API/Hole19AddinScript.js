@@ -269,6 +269,8 @@ async function processHole19EventHandler()
       resultMessage.textContent = "Failure! Unable to process the input value " + inputField.value + ".";
     }
   }
+  pane2.style.display = "none";
+  pane3.style.display = "block";
 }
 
 async function TestNewFunctionality()
@@ -298,8 +300,7 @@ try {
 console.info(lastRound, "TestNewFunctionality");
 }
 
-pane2.style.display = "none";
-pane3.style.display = "block";
+
 
 
 document.getElementById("addNewRound").addEventListener("click", add_new_round);
