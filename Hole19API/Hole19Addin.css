@@ -6,8 +6,8 @@ body {
 }
 
 /* Header styling */
-div[style*="background-color: #0078D7"] {
-    background-color: #0078D7;
+header {
+    background-color: #0078D7; /* Blue background */
     color: white;
     padding: 10px;
     display: flex;
@@ -16,17 +16,12 @@ div[style*="background-color: #0078D7"] {
     position: relative;
 }
 
-div[style*="display: flex; align-items: center;"] {
-    display: flex;
-    align-items: center;
-}
-
-img {
+header img {
     height: 80px;
     margin-right: 10px;
 }
 
-h1 {
+header h1 {
     margin: 0;
 }
 
