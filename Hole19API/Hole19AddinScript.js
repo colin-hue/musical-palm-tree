@@ -7,6 +7,13 @@ Office.onReady((info) => {
         }
     });
 
+document.getElementById("addNewRound").addEventListener("click", add_new_round);
+document.getElementById("processHold19").addEventListener("click", displayHole19ProcessingUI);
+document.getElementById("Test").addEventListener("click", TestNewFunctionality);
+document.getElementById("goButton").addEventListener("click", processHole19EventHandler);
+document.getElementById("okButton").addEventListener("click", resetHandler);
+
+
 async function file_get_contents(url) {
     console.info(url);
 
