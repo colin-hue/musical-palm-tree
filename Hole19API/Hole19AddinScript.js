@@ -1,4 +1,4 @@
-var Hole19_API_URL = "https://script.google.com/macros/s/AKfycbxV4gQkrJnf2GU10vBLvNsDsrnHJXbzY5QzMu3-eoxdKl7QGnaK6y39yZgUw5J5QwFoYw/exec"
+var Hole19_API_URL = "https://script.google.com/macros/s/AKfycbxJmX7hBOWpq7vQaCMHjBDUd6m9elR3oEOZt97tCFNyKv9hkFKITAl_8ktuExmOsot9Iw/exec"
 
 Office.onReady((info) => {
         // Check that we loaded into Excel
