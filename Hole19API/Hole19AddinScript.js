@@ -72,12 +72,35 @@ async function add_new_round()
   const context = new Excel.RequestContext();
   addNewRound(context);
 }
+function toExcelDateTime(isoString, utc = true) {
+  var d = new Date(isoString);
+  if (isNaN(d)) throw new Error("Invalid ISO string: " + isoString);
+
+  // choose UTC vs. local getters
+  var Y = utc ? d.getUTCFullYear()   : d.getFullYear();
+  var M = utc ? d.getUTCMonth() + 1  : d.getMonth() + 1;
+  var D = utc ? d.getUTCDate()       : d.getDate();
+  var h = utc ? d.getUTCHours()      : d.getHours();
+  var m = utc ? d.getUTCMinutes()    : d.getMinutes();
+  var s = utc ? d.getUTCSeconds()    : d.getSeconds();
+
+  // zero-pad helper
+  function pad(n){ return n < 10 ? "0"+n : n; }
+
+  return [
+    Y, pad(M), pad(D)
+  ].join("-")
+   + " "
+   + [ pad(h), pad(m), pad(s) ].join(":");
+}
+
+
 
 function loadNewData(context, data, newRoundRow)
 {
   //debugger;
   setCellValue(context, "Scores", "Scores!B" + newRoundRow, data.data.course);
-  setCellValue(context, "Scores", "Scores!A" + newRoundRow, data.data.date);
+  setCellValue(context, "Scores", "Scores!A" + newRoundRow, toExcelDateTime(data.data.date));  
   columns = [ "D","E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U" ];
   var newRound = newRoundRow;
   for(inputIndex=0; inputIndex < 18; inputIndex++)
