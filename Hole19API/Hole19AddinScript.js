@@ -50,11 +50,12 @@ async function gotoEnd(){
     var sheet = context.workbook.worksheets.getItem("Scores");
     var lastRound =  await getCellValue(context, "Scores", "Scores!D1");
     await context.sync();
-    gotoBeginning();
+    const firstRange = sheet.getRange("A3");
+    firstRange.select();
+    await context.sync();
     var destination = String(`A${lastRound}`);
     const destinationRange = sheet.getRange(destination);
     destinationRange.select();
-
     await context.sync();
   });
 }
