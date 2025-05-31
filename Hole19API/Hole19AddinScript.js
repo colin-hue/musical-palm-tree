@@ -129,21 +129,22 @@ function toExcelDateTime(isoString, utc = true) {
 function loadNewData(context, data, newRoundRow)
 {
   //debugger;
-  setCellValue(context, "Scores", "Scores!B" + newRoundRow, data.data.course, false);
-  setCellValue(context, "Scores", "Scores!A" + newRoundRow, toExcelDateTime(data.data.date), false);  
+  sync = false;
+  setCellValue(context, "Scores", "Scores!B" + newRoundRow, data.data.course, sync);
+  setCellValue(context, "Scores", "Scores!A" + newRoundRow, toExcelDateTime(data.data.date), sync);  
   columns = [ "D","E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U" ];
   var newRound = newRoundRow;
   for(inputIndex=0; inputIndex < 18; inputIndex++)
   {
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + newRound, data.data.pars[inputIndex], false);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + newRound, data.data.pars[inputIndex], sync);
 
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+1), data.data.score[inputIndex], false);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+4), data.data.index[inputIndex], false);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex], false);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+1), data.data.score[inputIndex], sync);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+4), data.data.index[inputIndex], sync);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex], sync);
     console.info("Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex], "loadNewData" );
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+13), data.data.putts[inputIndex], false);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+9), data.data.fairways[inputIndex], false);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+12), data.data.penalties[inputIndex], false);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+13), data.data.putts[inputIndex], sync);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+9), data.data.fairways[inputIndex], sync);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+12), data.data.penalties[inputIndex], sync);
   }
   context.sync();
 }
