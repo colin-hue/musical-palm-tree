@@ -44,8 +44,32 @@ async function file_get_contents(url) {
     }
 }
 
+async function gotoEnd(){
+
+  Excel.run(async (context) => {
+    var sheet = context.workbook.worksheets.getItem("Scores");
+    var lastRound =  await getCellValue(context, "Scores", "Scores!D1");
+    await context.sync();
+    var destination = String(`A${lastRound}`);
+    const destinationRange = sheet.getRange(destination);
+    destinationRange.select();
+    await context.sync();
+  });
+}
+
+
+async function gotoBeginning(){
+
+  Excel.run(async (context) => {
+    var sheet = context.workbook.worksheets.getItem("Scores");
+    const destinationRange = sheet.getRange("A1");
+    destinationRange.select();
+    await context.sync();
+  });
+}
+
 async function addNewRound(context) {
-  debugger;
+  //debugger;
     var sheet = context.workbook.worksheets.getItem("Scores");
     var lastRound =  await getCellValue(context, "Scores", "Scores!D1");
     var source = String(`A${lastRound - 3}:AA${lastRound + 15}`);
@@ -326,7 +350,8 @@ console.info(lastRound, "TestNewFunctionality");
 
 
 
-
+document.getElementById("gotoEnd").addEventListener("click", gotoEnd);
+document.getElementById("gotoBeginning").addEventListener("click", gotoBeginning);
 document.getElementById("addNewRound").addEventListener("click", add_new_round);
 document.getElementById("processHold19").addEventListener("click", displayHole19ProcessingUI);
 document.getElementById("TestNewFunctionality").addEventListener("click", TestNewFunctionality );
