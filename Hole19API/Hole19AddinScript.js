@@ -112,7 +112,8 @@ function loadNewData(context, data, newRoundRow)
     setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex]);
     console.info("Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex], "loadNewData" );
     setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+13), data.data.putts[inputIndex]);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+12), data.data.penalties[inputIndex]);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+9), data.data.penalties[inputIndex]);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+12), data.data.fairways[inputIndex]);
   }
   context.sync();
 }
