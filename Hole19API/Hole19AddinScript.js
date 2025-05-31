@@ -53,8 +53,11 @@ async function gotoEnd(){
     const firstRange = sheet.getRange("A3");
     firstRange.select();
     await context.sync();
-    var destination = String(`A${lastRound}`);
-    const destinationRange = sheet.getRange(destination);
+    var destination = String(`A${lastRound+15}`);
+    var destinationRange = sheet.getRange(destination);
+    destinationRange.select();
+    destination = String(`A${lastRound}`);
+    destinationRange = sheet.getRange(destination);
     destinationRange.select();
     await context.sync();
   });
