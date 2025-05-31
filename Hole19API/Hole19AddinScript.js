@@ -62,7 +62,7 @@ async function gotoBeginning(){
 
   Excel.run(async (context) => {
     var sheet = context.workbook.worksheets.getItem("Scores");
-    const destinationRange = sheet.getRange("A1");
+    const destinationRange = sheet.getRange("A3");
     destinationRange.select();
     await context.sync();
   });
