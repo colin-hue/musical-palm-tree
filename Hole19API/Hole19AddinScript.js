@@ -129,21 +129,21 @@ function toExcelDateTime(isoString, utc = true) {
 function loadNewData(context, data, newRoundRow)
 {
   //debugger;
-  setCellValue(context, "Scores", "Scores!B" + newRoundRow, data.data.course);
-  setCellValue(context, "Scores", "Scores!A" + newRoundRow, toExcelDateTime(data.data.date));  
+  setCellValue(context, "Scores", "Scores!B" + newRoundRow, data.data.course, false);
+  setCellValue(context, "Scores", "Scores!A" + newRoundRow, toExcelDateTime(data.data.date), false);  
   columns = [ "D","E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U" ];
   var newRound = newRoundRow;
   for(inputIndex=0; inputIndex < 18; inputIndex++)
   {
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + newRound, data.data.pars[inputIndex]);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + newRound, data.data.pars[inputIndex], false);
 
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+1), data.data.score[inputIndex]);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+4), data.data.index[inputIndex]);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex]);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+1), data.data.score[inputIndex], false);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+4), data.data.index[inputIndex], false);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex], false);
     console.info("Scores!" + columns[inputIndex] + Number(newRound+11), data.data.sandshots[inputIndex], "loadNewData" );
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+13), data.data.putts[inputIndex]);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+9), data.data.fairways[inputIndex]);
-    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+12), data.data.penalties[inputIndex]);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+13), data.data.putts[inputIndex], false);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+9), data.data.fairways[inputIndex], false);
+    setCellValue(context, "Scores", "Scores!" + columns[inputIndex] + Number(newRound+12), data.data.penalties[inputIndex], false);
   }
   context.sync();
 }
@@ -225,13 +225,13 @@ async function register_handler(excel){
 });
 }
 
-function setCellValue(excel, sheetName, address, value){
+function setCellValue(excel, sheetName, address, value, sync=true){
     console.info("Getting Worksheet", "setCellValue");
     
     let sheet = excel.workbook.worksheets.getItem(sheetName);
     
     sheet.getRange(address).values = new String(value);
-    excel.sync();
+    if (sync == true) excel.sync();
     return true;
 }
 
