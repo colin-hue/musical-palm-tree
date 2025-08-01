@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+
+  <Id>your-guid-here</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Your Provider Name</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Extension Inspector" />
+  <Description DefaultValue="Inspect and clean Excel runtime caches" />
+  <IconUrl DefaultValue="https://colin-hue.github.io/assets/icon.png"/>
+  <SupportUrl DefaultValue="https://colin-hue.github.io/support" />
+
+  <!-- Taskpane entrypoint -->
+  <Hosts>
+    <Host Name="Workbook" />
+  </Hosts>
+
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="CustomFunctionsRuntime" MinVersion="1.1"/>
+      <Set Name="ExcelApi" MinVersion="1.6"/>
+    </Sets>
+  </Requirements>
+
+  <!-- Permissions -->
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://colin-hue.github.io/taskpane.html"/>
+  </DefaultSettings>
+
+  <!-- Custom Functions runtime -->
+  <ExtendedOverrides>
+    <ov:Overrides>
+      <ov:VersionOverrides xsi:type="ov:VersionOverridesV1_0" 
+                           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides">
+
+        <ov:Hosts>
+          <ov:Host xsi:type="ov:Workbook">
+            <ov:Runtime>
+              <ov:ResId resid="Runtime.Url"/>
+              <ov:SupportsSharedRuntime>true</ov:SupportsSharedRuntime>
+            </ov:Runtime>
+
+            <!-- Function mapping -->
+            <ov:FunctionMappings>
+              <ov:FunctionMap>
+                <ov:Function Name="MYFUNC" FunctionType="Scalar" />
+              </ov:FunctionMap>
+            </ov:FunctionMappings>
+
+            <!-- CustomFunctions metadata -->
+            <ov:CustomFunctions>
+              <ov:Namespace>CFInspector</ov:Namespace>
+              <ov:Functions>
+                <ov:Function Name="MYFUNC">
+                  <ov:Script>
+                    <ov:ScriptLocation resid="CustomFunctions.Script.Url"/>
+                  </ov:Script>
+                  <ov:Parameters>
+                    <ov:Parameter Name="input" Type="string"/>
+                  </ov:Parameters>
+                  <ov:Result Type="string"/>
+                </ov:Function>
+              </ov:Functions>
+            </ov:CustomFunctions>
+          </ov:Host>
+        </ov:Hosts>
+
+        <ov:Resources>
+          <ov:bt:Urls>
+            <ov:bt:Url id="Runtime.Url" DefaultValue="https://colin-hue.github.io/customfunctions.html"/>
+            <ov:bt:Url id="CustomFunctions.Script.Url" DefaultValue="https://colin-hue.github.io/functions.js"/>
+          </ov:bt:Urls>
+        </ov:Resources>
+
+      </ov:VersionOverrides>
+    </ov:Overrides>
+  </ExtendedOverrides>
+</OfficeApp>

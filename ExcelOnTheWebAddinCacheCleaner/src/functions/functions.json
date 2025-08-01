@@ -1,0 +1,15 @@
+{
+  "functions": [
+    {
+      "id": "ABOUT",
+      "name": "ABOUT",
+      "description": "Displays extension info and runtime status",
+      "helpUrl": "https://your-extension-docs-url.example",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "dimensionality": "scalar"
+      }
+    }
+  ]
+}
