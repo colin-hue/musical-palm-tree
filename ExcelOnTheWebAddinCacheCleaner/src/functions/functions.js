@@ -1,11 +1,12 @@
 /**
  * @customfunction
  */
-
-
-function ABOUT() {
-  return "Extension Inspector v1.0 - Runtime bridge active.";
-}
+!(function () {
+  "use strict";
+  CustomFunctions.associate("ABOUT", function (n, t) {
+    return "Extension Inspector v1.0 - Runtime bridge active.";
+  });
+})();
 
 function listManifestEntriesFromLocalStorage() {
   const matches = [];
