@@ -1,6 +1,8 @@
 /**
  * @customfunction
  */
+
+
 function ABOUT() {
   return "Extension Inspector v1.0 - Runtime bridge active.";
 }
@@ -8,7 +10,7 @@ function ABOUT() {
 function listManifestEntriesFromLocalStorage() {
   const matches = [];
   const pattern = /^__OSF_UPLOADFILE\.Manifest\.(\d+)_(.+)$/;
-
+  
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     const match = key.match(pattern);
