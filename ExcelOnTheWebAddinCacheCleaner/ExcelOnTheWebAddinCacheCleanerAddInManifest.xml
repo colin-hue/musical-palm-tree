@@ -101,6 +101,8 @@
           DefaultValue="https://colin-hue.github.io/musical-palm-tree/ExcelOnTheWebAddinCacheCleaner/src/functions/functions.js" />
         <bt:Url id="Functions.Metadata.Url"
           DefaultValue="https://colin-hue.github.io/musical-palm-tree/ExcelOnTheWebAddinCacheCleaner/src/functions/functions.json" />
+        <bt:Url id="Functions.Page.Url"
+          DefaultValue="https://colin-hue.github.io/musical-palm-tree/ExcelOnTheWebAddinCacheCleaner/src/functions/functions.html" />
         <bt:Url id="Taskpane.Url"
           DefaultValue="https://colin-hue.github.io/musical-palm-tree/ExcelOnTheWebAddinCacheCleaner/src/taskpane/taskpane.html" />
         <bt:Url id="GetStarted.LearnMoreUrl"
