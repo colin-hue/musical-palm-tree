@@ -1,14 +1,17 @@
 /**
  * @customfunction
  */
-!(function () {
+
+
+(function () {
   "use strict";
-  CustomFunctions.associate("ABOUT", function (n, t) {
+  CustomFunctions.associate("ABOUT", function () {
     return "Extension Inspector v1.0 - Runtime bridge active.";
   });
 })();
 
 function listManifestEntriesFromLocalStorage() {
+  debugger;
   const matches = [];
   const pattern = /^__OSF_UPLOADFILE\.Manifest\.(\d+)_(.+)$/;
   
@@ -35,4 +38,22 @@ function listManifestEntriesFromLocalStorage() {
   return matches;
 }
 
-Office.addin.setGlobalVariable("listManifestEntriesFromLocalStorage", listManifestEntriesFromLocalStorage);
+Office.onReady(() => {
+    if (info.host === Office.HostType.Excel) {
+    console.log("📡 Custom functions runtime is ready");
+
+    // Check for shared runtime availability
+    if (Office.addin?.getGlobal) {
+      console.log("✅ Shared runtime active");
+
+      const globals = Office.addin.getGlobal();
+      globals.mySharedState = { loaded: true };
+    } else {
+      console.warn("⚠️ Shared runtime not active in custom functions context");
+    }
+  }
+  if (Office.addin?.getGlobal) {
+    const globals = Office.addin.getGlobal();
+    globals.listManifestEntriesFromLocalStorage = listManifestEntriesFromLocalStorage;
+  }
+});
