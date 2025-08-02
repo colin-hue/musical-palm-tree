@@ -5,6 +5,7 @@
 
 (function () {
   "use strict";
+  debugger;
   CustomFunctions.associate("ABOUT", function () {
     return "Extension Inspector v1.0 - Runtime bridge active.";
   });
@@ -39,6 +40,7 @@ function listManifestEntriesFromLocalStorage() {
 }
 
 Office.onReady(() => {
+    debugger;
     if (info.host === Office.HostType.Excel) {
     console.log("📡 Custom functions runtime is ready");
 
