@@ -5,14 +5,14 @@
 
 (function () {
   "use strict";
-  debugger;
+    console.log("function.js Association Called");
   CustomFunctions.associate("ABOUT", function () {
     return "Extension Inspector v1.0 - Runtime bridge active.";
   });
 })();
 
 function listManifestEntriesFromLocalStorage() {
-  debugger;
+  console.log("function.js listManifestEntriesFromLocalStorage Called");
   const matches = [];
   const pattern = /^__OSF_UPLOADFILE\.Manifest\.(\d+)_(.+)$/;
   
@@ -40,7 +40,7 @@ function listManifestEntriesFromLocalStorage() {
 }
 
 Office.onReady(() => {
-    debugger;
+    console.log("function.js onReady Called");
     if (info.host === Office.HostType.Excel) {
     console.log("📡 Custom functions runtime is ready");
 

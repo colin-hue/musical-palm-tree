@@ -1,5 +1,5 @@
 Office.onReady(async () => {
-  debugger;
+  console.log("TaskPane.js OnReady Called");
   const container = document.getElementById("results");
 
   try {
