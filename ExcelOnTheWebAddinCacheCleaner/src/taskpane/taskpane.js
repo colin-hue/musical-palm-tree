@@ -34,4 +34,15 @@ document.getElementById("getStartedButton").addEventListener("click", async () =
   const container = document.getElementById("results");
   container.innerHTML = "<p>Loading...</p>";
   await listManifests();
+});
+
+console.log("🔬 SharedRuntime Diagnostic");
+console.log("typeof Office.addin.getGlobal:", typeof Office?.addin?.getGlobal);
+
+try {
+  const globals = Office.addin.getGlobal();
+  console.log("✅ getGlobal returned:", globals);
+  globals.mySharedState = { ping: Date.now() };
+} catch (e) {
+  console.warn("❌ getGlobal threw:", e);
 }
