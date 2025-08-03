@@ -28,7 +28,7 @@ async function listManifests(){
     console.error(err);
   }
 }
-Office.onReady(async () => await listManifests());
+//Office.onReady(async () => await listManifests());
 
 document.getElementById("getStartedButton").addEventListener("click", async () => {
   const container = document.getElementById("results");
