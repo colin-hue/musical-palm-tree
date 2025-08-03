@@ -3,12 +3,7 @@
  */
 
 
-(function () {
-  "use strict";
-  console.log("function.js Association Called");
-  CustomFunctions.associate("ABOUT", about() );
-  CustomFunctions.associate("LIST", listManifestEntriesFromLocalStorage() );
-})();
+
 
 function about() {
     return "Extension Inspector v1.0 - Runtime bridge active.";
@@ -73,3 +68,10 @@ try {
 } catch (e) {
   console.warn("❌ getGlobal threw:", e);
 }
+
+(function () {
+  "use strict";
+  console.log("function.js Association Called");
+  CustomFunctions.associate("ABOUT", about );
+  CustomFunctions.associate("LIST", listManifestEntriesFromLocalStorage);
+})();
