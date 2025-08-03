@@ -10,6 +10,17 @@
         "type": "string",
         "dimensionality": "scalar"
       }
+    },
+    {
+      "id": "LIST",
+      "name": "LIST",
+      "description": "List elements from the LocalStore Cache",
+      "helpUrl": "https://your-extension-docs-url.example",
+      "parameters": [],
+      "returns": {
+        "type": "string",
+        "dimensionality": "scalar"
+      }
     }
   ]
 }

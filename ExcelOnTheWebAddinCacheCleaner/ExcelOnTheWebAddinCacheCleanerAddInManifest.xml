@@ -29,13 +29,14 @@
   </DefaultSettings>
   <Permissions>ReadWriteDocument</Permissions>
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
-    xsi:type="VersionOverridesV1_0">
+    xsi:type="VersionOverridesV1_2">
     <Hosts>
       <Host xsi:type="Workbook">
         <Runtimes>
           <SharedRuntime>
             <Enable>true</Enable>
-         </SharedRuntime>
+          </SharedRuntime>
+          <SourceLocation resid="Functions.Page.Url" />
         </Runtimes>
         <AllFormFactors>
           <ExtensionPoint xsi:type="CustomFunctions">
@@ -57,7 +58,6 @@
             <Description resid="GetStarted.Description" />
             <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
           </GetStarted>
-          <FunctionFile resid="Taskpane.Url" />
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
               <Group id="CommandsGroup">
