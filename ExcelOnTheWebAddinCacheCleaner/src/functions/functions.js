@@ -39,7 +39,7 @@ function listManifestEntriesFromLocalStorage() {
   return matches;
 }
 
-Office.onReady(() => {
+Office.onReady((info) => {
     console.log("function.js onReady Called");
     if (info.host === Office.HostType.Excel) {
     console.log("📡 Custom functions runtime is ready");
