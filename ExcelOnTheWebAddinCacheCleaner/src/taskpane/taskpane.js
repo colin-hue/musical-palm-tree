@@ -1,4 +1,4 @@
-Office.onReady(async () => {
+async function listManifests(){
   console.log("TaskPane.js OnReady Called");
   const container = document.getElementById("results");
 
@@ -27,4 +27,11 @@ Office.onReady(async () => {
     container.innerHTML = `<p>Error accessing runtime: ${err.message}</p>`;
     console.error(err);
   }
-});
+}
+Office.onReady(async () => await listManifests());
+
+document.getElementById("getStartedButton").addEventListener("click", async () => {
+  const container = document.getElementById("results");
+  container.innerHTML = "<p>Loading...</p>";
+  await listManifests();
+}
