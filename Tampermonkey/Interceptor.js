@@ -6,9 +6,9 @@
 // @author       You
 // @match        https://www.nytimes.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=nytimes.com
-// @updateURL    https://colin-hue.github.io/musical-palm-tree/tampermonkey/interceptor.js
-// @downloadURL  https://colin-hue.github.io/musical-palm-tree/tampermonkey/interceptor.js
-// @require      https://colin-hue.github.io/musical-palm-tree/tampermonkey/interceptor.js
+// @updateURL    https://colin-hue.github.io/musical-palm-tree/Tampermonkey/Interceptor.js
+// @downloadURL  https://colin-hue.github.io/musical-palm-tree/Tampermonkey/Interceptor.js
+// @require      https://colin-hue.github.io/musical-palm-tree/Tampermonkey/Interceptor.js
 // @grant        none
 // ==/UserScript==
 
