@@ -71,7 +71,7 @@
             const distY = Math.abs(touchEndY - touchStartY);
 
             if (touchDuration < 300 && distX < 10 && distY < 10) {
-                alert("Targetted");
+                //alert("Targetted");
                 let target = e.target;
                 // Walk up to find the closest link or button if clicked on an inner element
                 while (target && target !== document.body && !target.href && !target.onclick) {
@@ -81,7 +81,7 @@
 
                 if (target && (target.tagName === 'A' || target.href)) {
                     // Prevent default jump, then programmatically open the link or fire click
-                    alert("Target Element");
+                    //alert("Target Element");
                     e.preventDefault();
                     if (target.href) {
                         alert(target.href);
@@ -92,7 +92,7 @@
                     }
                 }
             }
-            alert("TouchEnd");
+            //alert("TouchEnd");
         }
     }, { passive: false });
 
