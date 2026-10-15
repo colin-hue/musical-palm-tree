@@ -51,6 +51,7 @@
     let touchStartTime = 0;
 
     window.addEventListener('touchstart', (e) => {
+        alert("Touchstart");
         if (e.touches.length === 1) {
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
