@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Aggressive Scroll & Touch Unlocker (Click Fix)
+// @name         Aggressive Scroll & Touch Unlocker (Full Click Fix)
 // @namespace    http://tampermonkey.net/
-// @version      211.0.4
-// @description  Defeat scroll & touch blockers while keeping links clickable
+// @version      211.0.5
+// @description  Defeat scroll & touch blockers while preserving mouse and touch clicks
 // @author       Colin Bell
 // @match        *://*.heraldscotland.com/*
 // @match        *://*.scotsman.com/*
@@ -22,17 +22,8 @@
 (function() {
     'use strict';
 
-    // 1. NEUTRALIZE preventDefault ONLY FOR SCROLL DRAGS (touchmove)
-    // Preserves tap-to-click functionality on links while blocking scroll traps.
-    const originalPreventDefault = TouchEvent.prototype.preventDefault;
-    TouchEvent.prototype.preventDefault = function() {
-        if (this.type === 'touchmove') {
-            return; // Drop preventDefault on scroll drags only
-        }
-        return originalPreventDefault.apply(this, arguments);
-    };
-
-    // 2. INTERCEPT addEventListener & FORCE PASSIVE LISTENERS
+    // 1. ALLOW ALL DEFAULT NATIVE EVENT BEHAVIORS FOR TOUCH / MOUSE
+    // We remove prototype overrides on preventDefault to avoid breaking mouse or tap clicks.
     const originalAddEventListener = EventTarget.prototype.addEventListener;
     EventTarget.prototype.addEventListener = function(type, listener, options) {
         if (type === 'touchmove' || type === 'touchstart' || type === 'wheel' || type === 'mousewheel') {
@@ -45,7 +36,7 @@
         return originalAddEventListener.call(this, type, listener, options);
     };
 
-    // 3. INJECT STYLES: UNLOCK SCROLL & MAKE PAYWALL OVERLAYS CLICK-THROUGH
+    // 2. INJECT CSS FOR UNLOCKING LAYOUT & NEUTRALIZING INVISIBLE OVERLAYS
     const injectCSS = () => {
         const style = document.createElement('style');
         style.textContent = `
@@ -53,19 +44,21 @@
                 overflow: auto !important;
                 overflow-y: auto !important;
                 position: static !important;
-            }
-            *, html, body {
                 touch-action: pan-y pinch-zoom !important;
             }
-            /* Strip interactivity from invisible paywall/backdrop overlays */
+
+            /* Disable pointer interception on modal backdrops and known paywall classes */
             .tp-modal,
             .tp-backdrop,
             .tp-active,
             .pp-prompt,
             #ovp-footballco,
             .BoxStyles_commercial__Wo6Z4,
-            [class*="paywall"],
-            [class*="overlay"] {
+            div[class*="tp-"],
+            div[id*="tp-"],
+            div[class*="paywall"],
+            div[class*="overlay"],
+            div[class*="modal"] {
                 display: none !important;
                 pointer-events: none !important;
             }
@@ -79,12 +72,14 @@
         window.addEventListener('DOMContentLoaded', injectCSS, { passive: true });
     }
 
-    // 4. MUTATION OBSERVER TO KEEP BODY/HTML UNLOCKED
+    // 3. OBSERVER TO DYNAMICALLY STRIP SCROLL LOCKS AND OVERLAY CLICK BLOCKERS
     let isUpdating = false;
-    const unlockStyles = () => {
+
+    const cleanupOverlaysAndUnlock = () => {
         if (isUpdating) return;
         isUpdating = true;
 
+        // Unlock html & body
         [document.documentElement, document.body].forEach(el => {
             if (el) {
                 const computed = window.getComputedStyle(el);
@@ -98,15 +93,28 @@
             }
         });
 
+        // Search for any fixed/absolute positioned elements with high z-index taking up full screen
+        const overlays = document.querySelectorAll('div, section, iframe');
+        overlays.forEach(el => {
+            const style = window.getComputedStyle(el);
+            if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex, 10) > 100) {
+                const rect = el.getBoundingClientRect();
+                // If element covers more than 50% of the screen height, disable its pointer interception
+                if (rect.height > window.innerHeight * 0.5 && rect.width > window.innerWidth * 0.5) {
+                    el.style.setProperty('pointer-events', 'none', 'important');
+                }
+            }
+        });
+
         setTimeout(() => { isUpdating = false; }, 100);
     };
 
-    unlockStyles();
-    const observer = new MutationObserver(unlockStyles);
+    // Run cleanups across lifecycle
+    cleanupOverlaysAndUnlock();
+    window.addEventListener('DOMContentLoaded', cleanupOverlaysAndUnlock, { passive: true });
+
+    const observer = new MutationObserver(cleanupOverlaysAndUnlock);
     if (document.documentElement) {
-        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
-    }
-    if (document.body) {
-        observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'] });
+        observer.observe(document.documentElement, { attributes: true, childList: true, subtree: true });
     }
 })();
