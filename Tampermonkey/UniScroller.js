@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Aggressive Scroll & Touch Unlocker (Full Click Fix)
+// @name         Aggressive Scroll & Touch Unlocker (Tap Fix)
 // @namespace    http://tampermonkey.net/
-// @version      211.0.5
-// @description  Defeat scroll & touch blockers while preserving mouse and touch clicks
+// @version      211.0.6
+// @description  Defeat scroll blockers and restore short taps/clicks
 // @author       Colin Bell
 // @match        *://*.heraldscotland.com/*
 // @match        *://*.scotsman.com/*
@@ -22,11 +22,20 @@
 (function() {
     'use strict';
 
-    // 1. ALLOW ALL DEFAULT NATIVE EVENT BEHAVIORS FOR TOUCH / MOUSE
-    // We remove prototype overrides on preventDefault to avoid breaking mouse or tap clicks.
+    // 1. BLOCK preventDefault ON ALL TOUCH EVENTS
+    // This ensures quick taps and drags cannot be canceled by paywall scripts.
+    const originalPreventDefault = TouchEvent.prototype.preventDefault;
+    TouchEvent.prototype.preventDefault = function() {
+        if (this.type === 'touchstart' || this.type === 'touchmove' || this.type === 'touchend') {
+            return; // Silently drop preventDefault for all touch interactions
+        }
+        return originalPreventDefault.apply(this, arguments);
+    };
+
+    // 2. INTERCEPT addEventListener & FORCE PASSIVE LISTENERS
     const originalAddEventListener = EventTarget.prototype.addEventListener;
     EventTarget.prototype.addEventListener = function(type, listener, options) {
-        if (type === 'touchmove' || type === 'touchstart' || type === 'wheel' || type === 'mousewheel') {
+        if (type === 'touchmove' || type === 'touchstart' || type === 'touchend' || type === 'wheel' || type === 'mousewheel') {
             if (typeof options === 'object' && options !== null) {
                 options.passive = true;
             } else {
@@ -36,7 +45,7 @@
         return originalAddEventListener.call(this, type, listener, options);
     };
 
-    // 2. INJECT CSS FOR UNLOCKING LAYOUT & NEUTRALIZING INVISIBLE OVERLAYS
+    // 3. INJECT STYLES FOR SCROLL AND OVERLAYS
     const injectCSS = () => {
         const style = document.createElement('style');
         style.textContent = `
@@ -46,19 +55,12 @@
                 position: static !important;
                 touch-action: pan-y pinch-zoom !important;
             }
-
-            /* Disable pointer interception on modal backdrops and known paywall classes */
             .tp-modal,
             .tp-backdrop,
             .tp-active,
             .pp-prompt,
             #ovp-footballco,
-            .BoxStyles_commercial__Wo6Z4,
-            div[class*="tp-"],
-            div[id*="tp-"],
-            div[class*="paywall"],
-            div[class*="overlay"],
-            div[class*="modal"] {
+            .BoxStyles_commercial__Wo6Z4 {
                 display: none !important;
                 pointer-events: none !important;
             }
@@ -72,14 +74,12 @@
         window.addEventListener('DOMContentLoaded', injectCSS, { passive: true });
     }
 
-    // 3. OBSERVER TO DYNAMICALLY STRIP SCROLL LOCKS AND OVERLAY CLICK BLOCKERS
+    // 4. OBSERVER TO KEEP BODY/HTML UNLOCKED
     let isUpdating = false;
-
-    const cleanupOverlaysAndUnlock = () => {
+    const unlockStyles = () => {
         if (isUpdating) return;
         isUpdating = true;
 
-        // Unlock html & body
         [document.documentElement, document.body].forEach(el => {
             if (el) {
                 const computed = window.getComputedStyle(el);
@@ -93,28 +93,15 @@
             }
         });
 
-        // Search for any fixed/absolute positioned elements with high z-index taking up full screen
-        const overlays = document.querySelectorAll('div, section, iframe');
-        overlays.forEach(el => {
-            const style = window.getComputedStyle(el);
-            if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex, 10) > 100) {
-                const rect = el.getBoundingClientRect();
-                // If element covers more than 50% of the screen height, disable its pointer interception
-                if (rect.height > window.innerHeight * 0.5 && rect.width > window.innerWidth * 0.5) {
-                    el.style.setProperty('pointer-events', 'none', 'important');
-                }
-            }
-        });
-
         setTimeout(() => { isUpdating = false; }, 100);
     };
 
-    // Run cleanups across lifecycle
-    cleanupOverlaysAndUnlock();
-    window.addEventListener('DOMContentLoaded', cleanupOverlaysAndUnlock, { passive: true });
-
-    const observer = new MutationObserver(cleanupOverlaysAndUnlock);
+    unlockStyles();
+    const observer = new MutationObserver(unlockStyles);
     if (document.documentElement) {
-        observer.observe(document.documentElement, { attributes: true, childList: true, subtree: true });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
+    }
+    if (document.body) {
+        observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'] });
     }
 })();
