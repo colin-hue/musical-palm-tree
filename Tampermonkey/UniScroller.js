@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Aggressive Scroll & Touch Unlocker (Tap Fix)
+// @name         Aggressive Scroll & Touch Unlocker (Universal Click & Tap Fix)
 // @namespace    http://tampermonkey.net/
-// @version      211.0.6
-// @description  Defeat scroll blockers and restore short taps/clicks
+// @version      211.0.7
+// @description  Defeat scroll blockers, restore mouse clicks, and force touch tap navigation
 // @author       Colin Bell
 // @match        *://*.heraldscotland.com/*
 // @match        *://*.scotsman.com/*
@@ -22,12 +22,12 @@
 (function() {
     'use strict';
 
-    // 1. BLOCK preventDefault ON ALL TOUCH EVENTS
-    // This ensures quick taps and drags cannot be canceled by paywall scripts.
+    // 1. NEUTRALIZE preventDefault ONLY FOR SCROLL DRAGS
+    // Keep touchstart and touchend active so normal tap-to-click works.
     const originalPreventDefault = TouchEvent.prototype.preventDefault;
     TouchEvent.prototype.preventDefault = function() {
-        if (this.type === 'touchstart' || this.type === 'touchmove' || this.type === 'touchend') {
-            return; // Silently drop preventDefault for all touch interactions
+        if (this.type === 'touchmove') {
+            return; // Drop preventDefault during scroll drags
         }
         return originalPreventDefault.apply(this, arguments);
     };
@@ -45,7 +45,50 @@
         return originalAddEventListener.call(this, type, listener, options);
     };
 
-    // 3. INJECT STYLES FOR SCROLL AND OVERLAYS
+    // 3. SYNTHESIZE CLICKS FOR SHORT TAPS (Fallback if browser suppresses click)
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchStartTime = 0;
+
+    window.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            touchStartTime = Date.now();
+        }
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+        if (e.changedTouches.length === 1) {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // If it's a quick tap (under 300ms) and didn't move much (not a scroll drag)
+            const distX = Math.abs(touchEndX - touchStartX);
+            const distY = Math.abs(touchEndY - touchStartY);
+
+            if (touchDuration < 300 && distX < 10 && distY < 10) {
+                let target = e.target;
+                // Walk up to find the closest link or button if clicked on an inner element
+                while (target && target !== document.body && !target.href && !target.onclick) {
+                    target = target.parentElement;
+                }
+
+                if (target && (target.tagName === 'A' || target.href)) {
+                    // Prevent default jump, then programmatically open the link or fire click
+                    e.preventDefault();
+                    if (target.href) {
+                        window.location.href = target.href;
+                    } else {
+                        target.click();
+                    }
+                }
+            }
+        }
+    }, { passive: false });
+
+    // 4. INJECT STYLES FOR SCROLL AND OVERLAYS
     const injectCSS = () => {
         const style = document.createElement('style');
         style.textContent = `
@@ -74,7 +117,7 @@
         window.addEventListener('DOMContentLoaded', injectCSS, { passive: true });
     }
 
-    // 4. OBSERVER TO KEEP BODY/HTML UNLOCKED
+    // 5. OBSERVER TO KEEP BODY/HTML UNLOCKED
     let isUpdating = false;
     const unlockStyles = () => {
         if (isUpdating) return;
