@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Aggressive Scroll Unlocker
+// @name         Aggressive Scroll & Touch Unlocker (Click Fix)
 // @namespace    http://tampermonkey.net/
-// @version      211.0.2
-// @description  Defeat scroll & touch blockers on news sites
+// @version      211.0.4
+// @description  Defeat scroll & touch blockers while keeping links clickable
 // @author       Colin Bell
 // @match        *://*.heraldscotland.com/*
 // @match        *://*.scotsman.com/*
@@ -22,9 +22,17 @@
 (function() {
     'use strict';
 
-    // 1. INTERCEPT TOUCH LISTENERS (MUST RUN AT DOCUMENT-START)
-    // Paywall scripts attach 'touchmove' / 'touchstart' listeners and call preventDefault().
-    // Overriding addEventListener forces 'passive: true', preventing JS from cancelling scroll drags.
+    // 1. NEUTRALIZE preventDefault ONLY FOR SCROLL DRAGS (touchmove)
+    // Preserves tap-to-click functionality on links while blocking scroll traps.
+    const originalPreventDefault = TouchEvent.prototype.preventDefault;
+    TouchEvent.prototype.preventDefault = function() {
+        if (this.type === 'touchmove') {
+            return; // Drop preventDefault on scroll drags only
+        }
+        return originalPreventDefault.apply(this, arguments);
+    };
+
+    // 2. INTERCEPT addEventListener & FORCE PASSIVE LISTENERS
     const originalAddEventListener = EventTarget.prototype.addEventListener;
     EventTarget.prototype.addEventListener = function(type, listener, options) {
         if (type === 'touchmove' || type === 'touchstart' || type === 'wheel' || type === 'mousewheel') {
@@ -37,32 +45,55 @@
         return originalAddEventListener.call(this, type, listener, options);
     };
 
-    // 2. CSS STYLES & OVERFLOW UNLOCKER
-    let isUpdating = false;
+    // 3. INJECT STYLES: UNLOCK SCROLL & MAKE PAYWALL OVERLAYS CLICK-THROUGH
+    const injectCSS = () => {
+        const style = document.createElement('style');
+        style.textContent = `
+            html, body {
+                overflow: auto !important;
+                overflow-y: auto !important;
+                position: static !important;
+            }
+            *, html, body {
+                touch-action: pan-y pinch-zoom !important;
+            }
+            /* Strip interactivity from invisible paywall/backdrop overlays */
+            .tp-modal,
+            .tp-backdrop,
+            .tp-active,
+            .pp-prompt,
+            #ovp-footballco,
+            .BoxStyles_commercial__Wo6Z4,
+            [class*="paywall"],
+            [class*="overlay"] {
+                display: none !important;
+                pointer-events: none !important;
+            }
+        `;
+        (document.head || document.documentElement).appendChild(style);
+    };
 
-    const unlock = () => {
+    if (document.documentElement) {
+        injectCSS();
+    } else {
+        window.addEventListener('DOMContentLoaded', injectCSS, { passive: true });
+    }
+
+    // 4. MUTATION OBSERVER TO KEEP BODY/HTML UNLOCKED
+    let isUpdating = false;
+    const unlockStyles = () => {
         if (isUpdating) return;
         isUpdating = true;
 
-        const targets = [document.documentElement, document.body];
-        targets.forEach(el => {
+        [document.documentElement, document.body].forEach(el => {
             if (el) {
-                const style = window.getComputedStyle(el);
-                
-                // Fix CSS overflow locks
-                if (style.overflow === 'hidden' || style.overflowY === 'hidden') {
+                const computed = window.getComputedStyle(el);
+                if (computed.overflow === 'hidden' || computed.overflowY === 'hidden') {
                     el.style.setProperty('overflow', 'auto', 'important');
                     el.style.setProperty('overflow-y', 'auto', 'important');
                 }
-                
-                // Fix position fixed/absolute locks on body/html
-                if (style.position === 'fixed' || style.position === 'absolute') {
+                if (computed.position === 'fixed') {
                     el.style.setProperty('position', 'static', 'important');
-                }
-
-                // Explicitly inform Android/Mobile browsers to allow vertical pan gestures
-                if (style.touchAction !== 'pan-y' && style.touchAction !== 'manipulation') {
-                    el.style.setProperty('touch-action', 'pan-y pinch-zoom', 'important');
                 }
             }
         });
@@ -70,26 +101,12 @@
         setTimeout(() => { isUpdating = false; }, 100);
     };
 
-    // Run immediately at early DOM creation
-    unlock();
-
-    // Attach listener for DOMReady to capture initial elements as they render
-    window.addEventListener('DOMContentLoaded', unlock, { passive: true });
-
-    // 3. MUTATION OBSERVER FOR DYNAMIC INLINE OVERRIDES
-    const setupObserver = () => {
-        const observer = new MutationObserver(unlock);
-        if (document.documentElement) {
-            observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
-        }
-        if (document.body) {
-            observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'] });
-        }
-    };
-
-    if (document.documentElement || document.body) {
-        setupObserver();
-    } else {
-        window.addEventListener('DOMContentLoaded', setupObserver, { passive: true });
+    unlockStyles();
+    const observer = new MutationObserver(unlockStyles);
+    if (document.documentElement) {
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['style', 'class'] });
+    }
+    if (document.body) {
+        observer.observe(document.body, { attributes: true, attributeFilter: ['style', 'class'] });
     }
 })();
