@@ -104,7 +104,7 @@
                 overflow: auto !important;
                 overflow-y: auto !important;
                 position: static !important;
-                touch-action: pan-y pinch-zoom !important;
+                /*touch-action: pan-y pinch-zoom !important;*/
             }
             .tp-modal,
             .tp-backdrop,
@@ -114,6 +114,9 @@
             .BoxStyles_commercial__Wo6Z4 {
                 display: none !important;
                 pointer-events: none !important;
+            }
+            *, html, body {
+                touch-action: manipulation !important; /* Allows panning and pinch-zoom everywhere */
             }
         `;
         (document.head || document.documentElement).appendChild(style);
