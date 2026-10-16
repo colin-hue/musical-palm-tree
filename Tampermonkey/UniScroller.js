@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Aggressive Scroll & Touch Unlocker (Universal Click & Tap Fix)
 // @namespace    http://tampermonkey.net/
-// @version      211.0.13
+// @version      211.0.14
 // @description  Defeat scroll blockers, restore mouse clicks, and force touch tap navigation
 // @author       Colin Bell
 // @match        *://*.heraldscotland.com/*
@@ -104,7 +104,7 @@
                 overflow: auto !important;
                 overflow-y: auto !important;
                 position: static !important;
-                /*touch-action: pan-y pinch-zoom !important;*/
+                touch-action: pan-x pan-y pinch-zoom !important;
             }
             .tp-modal,
             .tp-backdrop,
@@ -114,9 +114,6 @@
             .BoxStyles_commercial__Wo6Z4 {
                 display: none !important;
                 pointer-events: none !important;
-            }
-            *, html, body {
-                touch-action: manipulation !important; /* Allows panning and pinch-zoom everywhere */
             }
         `;
         (document.head || document.documentElement).appendChild(style);
