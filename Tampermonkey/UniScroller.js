@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Aggressive Scroll & Touch Unlocker (Universal Click & Tap Fix)
 // @namespace    http://tampermonkey.net/
-// @version      211.0.14
+// @version      211.0.15
 // @description  Defeat scroll blockers, restore mouse clicks, and force touch tap navigation
 // @author       Colin Bell
 // @match        *://*.heraldscotland.com/*
@@ -9,6 +9,7 @@
 // @match        *://*.dailyrecord.co.uk/*
 // @match        *://*.observer.co.uk/*
 // @match        *://observer.co.uk/*
+// @match        *://www.thetimes.com/*
 // @exclude      *://*.garmin.com/*
 // @exclude      *://sso.garmin.com/*
 // @updateURL    https://colin-hue.github.io/musical-palm-tree/Tampermonkey/UniScroller.js
