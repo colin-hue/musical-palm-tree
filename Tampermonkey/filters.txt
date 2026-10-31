@@ -2,9 +2,6 @@
 ! 12 Sept 2026 https://buy.tinypass.com
 !buy.tinypass.com###template-container
 
-! Allow rule (Priority 2)
-@@garmin.com$doc,frame,xhr,script,image,stylesheet
-
 ! Tracker & script block rules (Priority 1)
 tinypass$script,xhr,frame
 piano$script,xhr,frame
