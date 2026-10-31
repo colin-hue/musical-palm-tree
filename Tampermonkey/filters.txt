@@ -1,1 +1,52 @@
 ||piano.io^$domain=observer.co.uk
+! 12 Sept 2026 https://buy.tinypass.com
+!buy.tinypass.com###template-container
+
+! Allow rule (Priority 2)
+@@garmin.com$doc,frame,xhr,script,image,stylesheet
+
+! Tracker & script block rules (Priority 1)
+tinypass$script,xhr,frame
+piano$script,xhr,frame
+viafoura$script,xhr,frame
+disqus$script,xhr,frame
+taboola$script,xhr,frame
+outbrain$script,xhr,frame
+chartbeat$script,xhr,frame
+permutive$script,xhr,frame
+npttech$script,xhr,frame
+experian$script,xhr,frame
+liveramp$script,xhr,frame
+neustar$script,xhr,frame
+zeotap$script,xhr,frame
+id5$script,xhr,frame
+lotame$script,xhr,frame
+tapad$script,xhr,frame
+criteo$script,xhr,frame
+expm$script,xhr,frame
+adobedtm$script,xhr,frame
+ensighten$script,xhr,frame
+segment$script,xhr,frame
+mparticle$script,xhr,frame
+tagcommander$script,xhr,frame
+! Remaining unique rules
+assets.adobedtm$script,xhr,frame
+googletagmanager$script,xhr,frame
+! Sub-frame block
+tpc_check.html$frame
+! Block core Piano / TinyPass engine network requests globally
+||tinypass.com^
+||piano.io^
+||experience.tinypass.com^
+! Block site-specific Piano endpoints (iNews & Telegraph)
+||vx.inews.co.uk^
+||p241.telegraph.co.uk^
+!news.co.uk##+js(remove-class, tp-modal-open, body)
+!news.co.uk##+js(set-attr, style, overflow: auto !important, body)
+
+! 19 Sept 2026 https://www.independent.co.uk
+!ww.independent.co.uk##.pn-indy__skip-selling-paywall.mos-modal-overlay
+
+! 22 Sept 2026 https://observer.co.uk
+||api-eu.piano.io/checkout/offer/show$subdocument
+||static01.nyt.com/ads/tpc-check.html$important
