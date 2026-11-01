@@ -1,5 +1,6 @@
 // ==UserScript==
-// @name         NewYorkTimes Interceptor
+// @name         NewYorkTimes Interceptor1
+// @version      1.1.1
 // @namespace    http://tampermonkey.net/
 // @version      2026-09-24
 // @description  try to take over the world!
