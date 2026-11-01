@@ -6,9 +6,9 @@
 // @author       You
 // @match        https://www.nytimes.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=nytimes.com
-// @updateURL    https://colin-hue.github.io/musical-palm-tree/Tampermonkey/Interceptor.js
-// @downloadURL  https://colin-hue.github.io/musical-palm-tree/Tampermonkey/Interceptor.js
-// @require      https://colin-hue.github.io/musical-palm-tree/Tampermonkey/Interceptor.js
+// @updateURL    https://1drv.ms/u/c/840fa66515d16e49/IQBn1NCAdlB1QIlF5yosfEeiAfHNQaMpGDkBFFoyC6Isn9c?e=Vk4bRP
+// @downloadURL  https://1drv.ms/u/c/840fa66515d16e49/IQBn1NCAdlB1QIlF5yosfEeiAfHNQaMpGDkBFFoyC6Isn9c?e=Vk4bRP
+// @require      https://1drv.ms/u/c/840fa66515d16e49/IQBn1NCAdlB1QIlF5yosfEeiAfHNQaMpGDkBFFoyC6Isn9c?e=Vk4bRP
 // @grant        none
 // ==/UserScript==
 
@@ -17,7 +17,7 @@
   if (document.URL === "https://www.nytimes.com/" || document.URL.startsWith("https://www.nytimes.com/puzzles") || document.URL.startsWith("https://www.nytimes.com/games") || document.URL.startsWith("https://www.nytimes.com/crossword")) return; //don't process the front page
   if (window.__shadow_cleaner_active) return;
   window.__shadow_cleaner_active = true;
-
+/*// @updateURL    https://colin-hue.github.io/musical-palm-tree/Tampermonkey/Interceptor.js*/
   console.log("🚀 Initializing Enhanced Shadow DOM Engine (Audio, Detail, RelatedUrls v3)...");
 
   function executeCleanRescue() {
