@@ -16,3 +16,5 @@ coverage/
 # Operating-system files
 .DS_Store
 Thumbs.db
+Tampermonkey/cert.pem
+Tampermonkey/key.pem
