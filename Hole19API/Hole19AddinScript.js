@@ -21,7 +21,7 @@ async function file_get_contents(url) {
         console.info("Fetching","file_get_contents");
         const response = await fetch(url, {
           method: "GET",
-          targetAddressSpace: "local", // Tells Chromium/Edge 157 this is an intentional local loopback call
+         // targetAddressSpace: "local", // Tells Chromium/Edge 157 this is an intentional local loopback call
           headers: {
               "X-API-Key": "your-secret-key" // Forces the OPTIONS preflight handshake
           }
