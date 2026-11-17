@@ -14,6 +14,7 @@
   <SupportUrl DefaultValue="https://learn.microsoft.com/office/dev/add-ins/overview/office-add-in-code-samples"/>
   <AppDomains>
     <AppDomain>https://www.hole19.com</AppDomain>
+    <AppDomain>https://127.0.0.1:9043</AppDomain>
   </AppDomains>
   <Resources>
     <Resource>

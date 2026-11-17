@@ -2,6 +2,8 @@
 
 var Hole19_API_URL = "https://127.0.0.1:9043/api/scorecard"
 
+//test url https://www.hole19golf.com/performance/rounds/MBYw9A
+
 Office.onReady((info) => {
         // Check that we loaded into Excel
         if (info.host === Office.HostType.Excel) {
@@ -17,7 +19,14 @@ async function file_get_contents(url) {
     try {
         // Fetch the webpage content
         console.info("Fetching","file_get_contents");
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          method: "GET",
+          targetAddressSpace: "local", // Tells Chromium/Edge 157 this is an intentional local loopback call
+          headers: {
+              "X-API-Key": "your-secret-key" // Forces the OPTIONS preflight handshake
+          }
+        });
+       // const response = await fetch(url);
         console.info("Fetched", "file_get_contents");
         if (response.ok)
         {
