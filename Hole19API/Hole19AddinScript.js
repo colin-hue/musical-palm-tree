@@ -1,4 +1,6 @@
-var Hole19_API_URL = "https://script.google.com/macros/s/AKfycbyoHEo8gUNzJfUYTz4oInOmPQivUtZyymyLo3laNPTFA7JPv4eiXb6e8iDTZvcNnIHIHQ/exec"
+//var Hole19_API_URL = "https://script.google.com/macros/s/AKfycbyoHEo8gUNzJfUYTz4oInOmPQivUtZyymyLo3laNPTFA7JPv4eiXb6e8iDTZvcNnIHIHQ/exec"
+
+var Hole19_API_URL = "https://127.0.0.1:9043/api/scorecard"
 
 Office.onReady((info) => {
         // Check that we loaded into Excel
