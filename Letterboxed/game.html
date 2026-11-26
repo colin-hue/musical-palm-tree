@@ -682,48 +682,34 @@
             const monthStr = String(d.getMonth() + 1).padStart(2, "0");
             const dayStr = String(d.getDate()).padStart(2, "0");
 
-            const targetUrl = `https://letterboxedanswers.com/${yearNum}/${monthStr}/${dayStr}/`;
+
+            const targetUrl = `https://script.google.com/macros/s/AKfycbwkKXlaVNdEPuVxOpyBNraae-gWM8ltrzNHFs0EYYKHl8bOx-1Au1If1wEHm_Bcr8hMCg/exec?url=${yearNum}${monthStr}${dayStr}/`;
+            console.log(targetUrl);
             
             showProxyStatus("fetching", `Fetching puzzle from letterboxedanswers.com...`);
             DOM.fetchIcon.classList.add("fa-spin");
 
             // Check if we have a direct preset match first
             const presetMatch = PRESET_PUZZLES.find(p => p.date === dateString);
-
-            // Proxy List Pipeline
-            const proxies = [
-                url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-                url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-                url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
-            ];
-
-            let htmlContent = null;
-            let usedProxyName = "";
-
-            for (let i = 0; i < proxies.length; i++) {
-                try {
-                    const proxyUrl = proxies[i](targetUrl);
-                    const resp = await fetch(proxyUrl, { cache: "no-store" });
+            try {
+                    const resp = await fetch(target, { cache: "no-store" });
                     if (resp.ok) {
-                        const text = await resp.text();
-                        if (text && text.length > 500 && (text.includes("Sides") || text.includes("Letter Box"))) {
-                            htmlContent = text;
-                            usedProxyName = new URL(proxyUrl).hostname;
-                            break;
-                        }
+                        const json = await resp.json();
+                        console.log(json);
+                        console.log(json.data.fjallets);
+                        htmlContent = json;
                     }
                 } catch (err) {
-                    console.warn(`Proxy ${i + 1} failed:`, err);
+                    console.warn(`Fetch failed:`, err);
                 }
             }
 
             DOM.fetchIcon.classList.remove("fa-spin");
 
             if (htmlContent) {
-                const parsed = parseLetterBoxedHTML(htmlContent);
-                if (parsed && parsed.sides && parsed.sides.length === 4) {
-                    showProxyStatus("success", `Successfully loaded via ${usedProxyName}!`);
-                    applyNewPuzzle(parsed.sides, parsed.par || 2, dateString, parsed.solutions || []);
+                if (htmlContent.data.fjallets && htmlContent.data.fjallets.length === 6) {
+                    showProxyStatus("success", `Successfully loaded !`);
+                    applyNewPuzzle(htmlContent.data.fjallets.slice(0,4), parsed.par || 2, dateString, htmlContent.data.fjallets.slice(4) || []);
                     return;
                 }
             }
