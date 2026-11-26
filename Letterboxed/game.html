@@ -676,91 +676,85 @@
 
         // 2. SCRAPER & CORS PROXY ENGINE
         async function fetchPuzzleFromWeb(dateString) {
-            // Convert YYYY-MM-DD to month-day-year (e.g. november-24-2026 or november-21-2025)
             const d = new Date(dateString + "T00:00:00");
             const yearNum = d.getFullYear();
             const monthStr = String(d.getMonth() + 1).padStart(2, "0");
             const dayStr = String(d.getDate()).padStart(2, "0");
 
+            const targetUrl =
+                `https://script.google.com/macros/s/AKfycbwkKXlaVNdEPuVxOpyBNraae-gWM8ltrzNHFs0EYYKHl8bOx-1Au1If1wEHm_Bcr8hMCg/exec?url=${yearNum}${monthStr}${dayStr}`;
 
-            const targetUrl = `https://script.google.com/macros/s/AKfycbwkKXlaVNdEPuVxOpyBNraae-gWM8ltrzNHFs0EYYKHl8bOx-1Au1If1wEHm_Bcr8hMCg/exec?url=${yearNum}${monthStr}${dayStr}/`;
             console.log(targetUrl);
-            
-            showProxyStatus("fetching", `Fetching puzzle from letterboxedanswers.com...`);
+
+            showProxyStatus("fetching", "Fetching puzzle...");
             DOM.fetchIcon.classList.add("fa-spin");
 
-            // Check if we have a direct preset match first
             const presetMatch = PRESET_PUZZLES.find(p => p.date === dateString);
+
+            let puzzleData = null;
+
             try {
-                    const resp = await fetch(target, { cache: "no-store" });
-                    if (resp.ok) {
-                        const json = await resp.json();
-                        console.log(json);
-                        console.log(json.data.fjallets);
-                        htmlContent = json;
-                    }
-                } catch (err) {
-                    console.warn(`Fetch failed:`, err);
+                const resp = await fetch(targetUrl, { cache: "no-store" });
+
+                if (resp.ok) {
+                    puzzleData = await resp.json();
+                    console.log(puzzleData);
                 }
+            } catch (err) {
+                console.warn("Fetch failed:", err);
             }
 
             DOM.fetchIcon.classList.remove("fa-spin");
 
-            if (htmlContent) {
-                if (htmlContent.data.fjallets && htmlContent.data.fjallets.length === 6) {
-                    showProxyStatus("success", `Successfully loaded !`);
-                    applyNewPuzzle(htmlContent.data.fjallets.slice(0,4), parsed.par || 2, dateString, htmlContent.data.fjallets.slice(4) || []);
-                    return;
-                }
+            if (
+                puzzleData &&
+                puzzleData.data &&
+                Array.isArray(puzzleData.data.fjallets) &&
+                puzzleData.data.fjallets.length === 6
+            ) {
+                const sides = puzzleData.data.fjallets.slice(0, 4);
+                const solutions = puzzleData.data.fjallets.slice(4);
+
+                showProxyStatus("success", "Successfully loaded!");
+
+                applyNewPuzzle(
+                    sides,
+                    2,             // or whatever par should be
+                    dateString,
+                    solutions
+                );
+
+                return;
             }
 
-            // Fallback to Preset if available or local default
+            // Fallback to preset
             if (presetMatch) {
-                showProxyStatus("info", `CORS/Network blocked fetch. Loaded pre-cached puzzle for ${presetMatch.label}.`);
-                applyNewPuzzle(presetMatch.sides, presetMatch.par, dateString, presetMatch.solutions);
+                showProxyStatus(
+                    "info",
+                    `Fetch failed. Loaded pre-cached puzzle for ${presetMatch.label}.`
+                );
+
+                applyNewPuzzle(
+                    presetMatch.sides,
+                    presetMatch.par,
+                    dateString,
+                    presetMatch.solutions
+                );
             } else {
-                showProxyStatus("error", `Could not fetch live puzzle for ${dateString}. Using fallback grid.`);
-                // Generic fallback puzzle generator from letters
-                applyNewPuzzle(["IHZ", "ADS", "VOR", "MTU"], 2, dateString, []);
+                showProxyStatus(
+                    "error",
+                    `Could not fetch live puzzle for ${dateString}. Using fallback grid.`
+                );
+
+                applyNewPuzzle(
+                    ["IHZ", "ADS", "VOR", "MTU"],
+                    2,
+                    dateString,
+                    []
+                );
             }
         }
 
-        function parseLetterBoxedHTML(htmlStr) {
-            // Look for patterns like: "Sides of this Letter Box are: IHZADSVORMTU" or "Sides: IHZ | ADS | VOR | MTU"
-            let sides = [];
-            
-            // Regex Pattern 1: Sides: ABC | DEF | GHI | JKL
-            const matchPipe = htmlStr.match(/Sides:\s*([A-Z]{3})\s*\|\s*([A-Z]{3})\s*\|\s*([A-Z]{3})\s*\|\s*([A-Z]{3})/i);
-            if (matchPipe) {
-                sides = [matchPipe[1].toUpperCase(), matchPipe[2].toUpperCase(), matchPipe[3].toUpperCase(), matchPipe[4].toUpperCase()];
-            } else {
-                // Regex Pattern 2: Sides of this Letter Box are: IHZADSVORMTU
-                const match12 = htmlStr.match(/Sides\s+(?:of\s+this\s+Letter\s+Box\s+are|are):\s*([A-Z]{12})/i);
-                if (match12) {
-                    const full = match12[1].toUpperCase();
-                    sides = [full.slice(0,3), full.slice(3,6), full.slice(6,9), full.slice(9,12)];
-                } else {
-                    // Regex Pattern 3: Scan for 4 consecutive 3-letter uppercase groups
-                    const groups = htmlStr.match(/\b([A-Z]{3})\b[\s\|,-]+\b([A-Z]{3})\b[\s\|,-]+\b([A-Z]{3})\b[\s\|,-]+\b([A-Z]{3})\b/);
-                    if (groups) {
-                        sides = [groups[1], groups[2], groups[3], groups[4]];
-                    }
-                }
-            }
-
-            // Optional: Extract solutions if present in DOM
-            let solutions = [];
-            const solMatches = htmlStr.match(/\b[A-Z]{3,15}\s*[\-—]\s*[A-Z]{3,15}\b/g);
-            if (solMatches) {
-                solutions = solMatches.map(s => s.replace(/\s+/g, '')).slice(0, 5);
-            }
-
-            return {
-                sides: sides,
-                par: 2,
-                solutions: solutions
-            };
-        }
 
         function showProxyStatus(type, msg) {
             DOM.proxyStatusBar.classList.remove("hidden");
