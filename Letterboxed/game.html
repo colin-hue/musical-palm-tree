@@ -678,13 +678,11 @@
         async function fetchPuzzleFromWeb(dateString) {
             // Convert YYYY-MM-DD to month-day-year (e.g. november-24-2026 or november-21-2025)
             const d = new Date(dateString + "T00:00:00");
-            const monthNames = ["january", "february", "march", "april", "may", "june", 
-                                "july", "august", "september", "october", "november", "december"];
-            const monthStr = monthNames[d.getMonth()];
-            const dayNum = d.getDate();
             const yearNum = d.getFullYear();
+            const monthStr = String(d.getMonth() + 1).padStart(2, "0");
+            const dayStr = String(d.getDate()).padStart(2, "0");
 
-            const targetUrl = `https://letterboxedanswers.com/letter-boxed-${monthStr}-${dayNum}-${yearNum}-answers/`;
+            const targetUrl = `https://letterboxedanswers.com/${yearNum}/${monthStr}/${dayStr}/`;
             
             showProxyStatus("fetching", `Fetching puzzle from letterboxedanswers.com...`);
             DOM.fetchIcon.classList.add("fa-spin");
