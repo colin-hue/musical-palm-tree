@@ -1,1327 +1,730 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NYT Letter Boxed Puzzle & Daily Scraper</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --nyt-bg: #fa9a8d;
-            --nyt-bg-dark: #ee7b69;
-            --nyt-box-bg: #ffffff;
-            --nyt-line-dark: #222222;
-            --nyt-line-active: #fa9a8d;
-            --nyt-node-border: #444444;
-            --nyt-node-bg: #ffffff;
-            --nyt-node-used: #3b82f6;
-            --nyt-text: #111827;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Letter Boxed</title>
+  <style>
+    :root {
+      --bg-coral: #fa9a8d;
+      --box-pink-tint: #fff5f3;
+      --ink-dark: #1a1a1b;
+      --accent-coral: #e86f5e;
+      --used-blue: #2d6cdf;
+    }
 
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--nyt-bg);
-            color: var(--nyt-text);
-            touch-action: manipulation;
-        }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
 
-        .font-serif-nyt {
-            font-family: 'Libre Baskerville', Georgia, serif;
-        }
+    body {
+      margin: 0;
+      padding: 12px 12px 28px;
+      background-color: var(--bg-coral);
+      color: var(--ink-dark);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-        /* Responsive Box Canvas Wrapper */
-        .box-container {
-            position: relative;
-            width: 100%;
-            max-width: 440px;
-            aspect-ratio: 1 / 1;
-            margin: 0 auto;
-        }
+    .top-bar {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
 
-        .letter-node {
-            transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    .pill-btn, .date-input {
+      background: rgba(255, 255, 255, 0.92);
+      border: none;
+      border-radius: 20px;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-dark);
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
 
-        .letter-node:hover {
-            transform: scale(1.12);
-        }
+    .status-banner {
+      width: 100%;
+      max-width: 440px;
+      background: rgba(255, 245, 243, 0.92);
+      border-radius: 12px;
+      padding: 6px 12px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
-        .letter-node:active {
-            transform: scale(0.95);
-        }
+    .status-banner.status-fetching { border-left: 4px solid #666; }
+    .status-banner.status-success  { border-left: 4px solid #1e8e3e; }
+    .status-banner.status-info     { border-left: 4px solid #2d6cdf; }
+    .status-banner.status-error    { border-left: 4px solid #d93025; }
 
-        .letter-node.used {
-            background-color: #2563eb;
-            color: #ffffff;
-            border-color: #1d4ed8;
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
-        }
+    .status-banner button {
+      background: none;
+      border: none;
+      color: var(--ink-dark);
+      font-weight: 700;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0 4px;
+    }
 
-        .letter-node.active-start {
-            background-color: #fa9a8d;
-            color: #ffffff;
-            border-color: #e05440;
-            box-shadow: 0 0 12px rgba(224, 84, 64, 0.5);
-        }
+    .current-word-wrap {
+      min-height: 46px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
 
-        .letter-node.shake {
-            animation: shake 0.4s ease-in-out;
-        }
+    .current-word {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      min-height: 38px;
+      text-transform: uppercase;
+    }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-        }
+    .word-underline {
+      width: 210px;
+      border-bottom: 2px dashed rgba(26, 26, 27, 0.65);
+      margin-top: 2px;
+    }
 
-        /* Toast Notifications */
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
-            pointer-events: none;
-        }
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 6px 0 10px;
+    }
 
-        .toast {
-            animation: fadeInOut 2.5s forwards ease-in-out;
-        }
+    .board-stage {
+      width: 100%;
+      max-width: 390px;
+      padding: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(-10px) scale(0.95); }
-            15% { opacity: 1; transform: translateY(0) scale(1); }
-            85% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-10px) scale(0.95); }
-        }
+    .puzzle-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background-color: var(--box-pink-tint);
+      border: 3px solid var(--ink-dark);
+      border-radius: 0px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
 
-        /* SVG Line drawing */
-        .line-committed {
-            stroke: #222222;
-            stroke-width: 3.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
+    .lines-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
 
-        .line-active {
-            stroke: #e05440;
-            stroke-width: 3.5;
-            stroke-dasharray: 6 4;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            animation: dash 1s linear infinite;
-        }
+    .letter-node {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background-color: #ffffff;
+      border: 2.5px solid var(--ink-dark);
+      color: var(--ink-dark);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      transition: transform 0.08s ease, background-color 0.15s ease, color 0.15s ease;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+    }
 
-        @keyframes dash {
-            to {
-                stroke-dashoffset: -20;
-            }
-        }
+    .letter-node:active {
+      transform: translate(-50%, -50%) scale(0.92);
+    }
 
-        /* Confetti canvas */
-        #confetti-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 60;
-        }
+    .letter-node.used {
+      background-color: var(--used-blue);
+      border-color: var(--used-blue);
+      color: #ffffff;
+    }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 9999px;
-        }
-    </style>
+    .letter-node.active-last {
+      background-color: var(--accent-coral);
+      border-color: #ffffff;
+      color: #ffffff;
+      box-shadow: 0 0 0 3px var(--accent-coral);
+    }
+
+    .letter-node.in-current {
+      background-color: #ffd8d1;
+      border-color: var(--accent-coral);
+      color: var(--ink-dark);
+    }
+
+    .controls-row {
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .action-btn {
+      border: none;
+      border-radius: 26px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: #ffffff;
+      color: var(--ink-dark);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+
+    .action-btn.primary {
+      background: var(--ink-dark);
+      color: #ffffff;
+      padding: 12px 22px;
+    }
+
+    .action-btn:active {
+      transform: scale(0.96);
+    }
+
+    .toast {
+      min-height: 24px;
+      margin-top: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-dark);
+      text-align: center;
+    }
+
+    .history-card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255, 245, 243, 0.92);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-top: 10px;
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      opacity: 0.75;
+      margin-bottom: 6px;
+    }
+
+    .word-chain {
+      font-family: Georgia, serif;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 50;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 20px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .modal h3 { margin: 0 0 10px; font-size: 18px; }
+
+    .side-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .side-inputs label {
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .side-inputs input {
+      padding: 8px;
+      font-size: 16px;
+      text-transform: uppercase;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      letter-spacing: 4px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-rose-200">
+<body>
 
-    <!-- Confetti Canvas -->
-    <canvas id="confetti-canvas"></canvas>
+  <div class="top-bar">
+    <input type="date" id="datePicker" class="date-input" />
+    <button class="pill-btn" id="openEditBtn">✎ Preset / Edit</button>
+    <button class="pill-btn" id="hintBtn">💡 Par</button>
+  </div>
 
-    <!-- Toast Container -->
-    <div id="toast-container" class="flex flex-col items-center space-y-2"></div>
+  <div class="status-banner status-fetching" id="statusBanner">
+    <span id="statusText">Loading puzzle...</span>
+    <button id="retryBtn">Retry</button>
+  </div>
 
-    <!-- Header Navigation -->
-    <header class="w-full max-w-4xl mx-auto px-4 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3 border-b border-black/10">
-        <div class="flex items-center space-x-3">
-            <h1 class="font-serif-nyt text-2xl md:text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
-                <i class="fa-solid fa-cube text-rose-700"></i> Letter Boxed
-            </h1>
-            <span class="text-xs bg-white/60 text-gray-800 font-semibold px-2.5 py-1 rounded-full border border-black/10 shadow-sm" id="date-display-badge">
-                Fetching...
-            </span>
-        </div>
+  <div class="current-word-wrap">
+    <div class="current-word" id="currentWordDisplay"></div>
+    <div class="word-underline"></div>
+  </div>
 
-        <!-- Controls Header Buttons -->
-        <div class="flex items-center space-x-2 flex-wrap gap-y-2">
-            <!-- Date Picker Input -->
-            <div class="relative flex items-center bg-white rounded-lg px-2.5 py-1 border border-black/15 shadow-sm text-sm">
-                <i class="fa-regular fa-calendar text-gray-500 mr-2"></i>
-                <input type="date" id="puzzle-date-picker" class="bg-transparent outline-none text-xs font-semibold text-gray-800 cursor-pointer">
-            </div>
+  <div class="stats-row">
+    <span id="wordCountStat">Words: 0</span>
+    <span>•</span>
+    <span id="letterCountStat">Letters: 0/12</span>
+    <span>•</span>
+    <span id="parStat">Par: 2 words</span>
+  </div>
 
-            <!-- Fetch / Refresh Button -->
-            <button id="btn-fetch-date" title="Fetch Puzzle for selected date" class="bg-gray-900 hover:bg-black text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-cloud-arrow-down" id="fetch-icon"></i> Fetch
-            </button>
-
-            <!-- Edit / Custom Modal Button -->
-            <button id="btn-open-edit" title="Custom Letters & Historical Puzzles" class="bg-white/80 hover:bg-white text-gray-800 px-3 py-1.5 rounded-lg text-xs font-semibold border border-black/15 shadow-sm flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-pen-to-square"></i> Preset / Edit
-            </button>
-
-            <!-- Instructions / Help Button -->
-            <button id="btn-open-help" title="Rules & Local Proxy Help" class="bg-white/80 hover:bg-white text-gray-800 p-2 rounded-lg text-xs font-semibold border border-black/15 shadow-sm transition">
-                <i class="fa-solid fa-circle-question text-base"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- Main Game Container -->
-    <main class="w-full max-w-xl mx-auto px-4 py-2 flex-grow flex flex-col items-center justify-center">
-
-        <!-- CORS Proxy Status Bar -->
-        <div id="proxy-status-bar" class="w-full max-w-md mb-2 hidden transition-all">
-            <div class="text-xs px-3 py-1.5 rounded-lg flex items-center justify-between shadow-sm border" id="proxy-status-box">
-                <span id="proxy-status-text" class="truncate">Status message</span>
-                <button id="btn-retry-proxy" class="underline ml-2 font-bold hover:opacity-80">Retry</button>
-            </div>
-        </div>
-
-        <!-- Word Construction & Target Stats -->
-        <div class="w-full max-w-md text-center mb-3">
-            <!-- Active Typing Display -->
-            <div class="h-10 flex items-center justify-center">
-                <span id="current-word-display" class="font-serif-nyt text-3xl font-bold tracking-widest text-gray-900 border-b-2 border-dashed border-gray-900 px-3 py-0.5 min-w-[120px] inline-block">
-                </span>
-            </div>
-            
-            <!-- Game Progress Stats -->
-            <div class="flex items-center justify-center gap-4 text-xs font-semibold text-gray-800 mt-2">
-                <span>Words: <strong id="word-count-num" class="text-gray-950 text-sm">0</strong></span>
-                <span class="text-gray-400">•</span>
-                <span>Letters: <strong id="letters-used-num" class="text-gray-950 text-sm">0</strong>/12</span>
-                <span class="text-gray-400">•</span>
-                <span>Par: <strong id="par-target-num" class="text-gray-950 text-sm">5</strong> words</span>
-            </div>
-        </div>
-
-        <!-- The NYT Letter Boxed Canvas Container -->
-        <div class="box-container my-1">
-            <!-- SVG Line Overlay layer -->
-            <svg id="lines-svg" class="absolute inset-0 w-full h-full pointer-events-none z-10" viewBox="0 0 400 400">
-                <!-- Outer Box Border -->
-                <rect x="40" y="40" width="320" height="320" rx="20" ry="20" fill="#ffffff" stroke="#222222" stroke-width="4" class="shadow-xl" />
-                <!-- Lines rendered dynamically via JS -->
-                <g id="lines-group"></g>
-            </svg>
-
-            <!-- Letter Nodes Container overlay -->
-            <div id="nodes-container" class="absolute inset-0 z-20 pointer-events-auto">
-                <!-- 12 Nodes rendered via JS -->
-            </div>
-        </div>
-
-        <!-- Action Controls (Delete, Submit, Clear, Undo) -->
-        <div class="w-full max-w-md flex items-center justify-center gap-2 mt-4">
-            <button id="btn-delete" class="bg-white hover:bg-gray-100 text-gray-900 font-bold px-4 py-2.5 rounded-xl border border-black/15 shadow text-xs flex items-center gap-1.5 transition active:scale-95">
-                <i class="fa-solid fa-delete-left"></i> Delete
-            </button>
-            <button id="btn-submit" class="bg-gray-900 hover:bg-black text-white font-bold px-6 py-2.5 rounded-xl shadow-lg text-xs flex items-center gap-1.5 transition active:scale-95">
-                <i class="fa-solid fa-check"></i> Submit Word
-            </button>
-            <button id="btn-undo" class="bg-white hover:bg-gray-100 text-gray-900 font-bold px-4 py-2.5 rounded-xl border border-black/15 shadow text-xs flex items-center gap-1.5 transition active:scale-95" title="Undo last word">
-                <i class="fa-solid fa-rotate-left"></i> Undo
-            </button>
-            <button id="btn-restart" class="bg-white/80 hover:bg-white text-gray-800 font-semibold p-2.5 rounded-xl border border-black/15 shadow text-xs transition active:scale-95" title="Clear All Progress">
-                <i class="fa-solid fa-arrows-rotate"></i>
-            </button>
-        </div>
-
-        <!-- Submitted Words Chain Display -->
-        <div class="w-full max-w-md mt-4">
-            <div class="bg-white/70 backdrop-blur rounded-xl p-3 border border-black/10 shadow-sm">
-                <div class="flex justify-between items-center mb-1 text-xs text-gray-600 font-bold uppercase tracking-wider">
-                    <span>Submitted Words</span>
-                    <span id="words-chain-count">0 words</span>
-                </div>
-                <div id="word-history-list" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pt-1">
-                    <span class="text-xs text-gray-500 italic">No words submitted yet. Tap letters or type to begin!</span>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="w-full text-center py-3 text-xs text-gray-800/80 font-medium">
-        NYT Letter Boxed Clone & Web Scraper • Dedicated to puzzle enthusiasts
-    </footer>
-
-    <!-- MODAL 1: Edit Letters & Select Historical Puzzle -->
-    <div id="modal-edit" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center border-b pb-3 mb-4">
-                <h3 class="font-serif-nyt text-xl font-bold text-gray-900">Puzzle Setup & Custom Letters</h3>
-                <button id="btn-close-edit" class="text-gray-400 hover:text-gray-600 text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="overflow-y-auto space-y-4 pr-1">
-                <!-- Preset Puzzles Selector -->
-                <div>
-                    <label class="block text-xs font-bold uppercase text-gray-600 mb-1">Select Historical / Sample Puzzle</label>
-                    <select id="preset-puzzles-select" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-sm font-semibold text-gray-800 outline-none focus:ring-2 focus:ring-rose-400">
-                        <!-- Populated by JS -->
-                    </select>
-                </div>
-
-                <div class="relative flex py-1 items-center">
-                    <div class="flex-grow border-t border-gray-200"></div>
-                    <span class="flex-shrink mx-3 text-xs font-bold text-gray-400 uppercase">OR Enter Custom 4 Sides</span>
-                    <div class="flex-grow border-t border-gray-200"></div>
-                </div>
-
-                <!-- Custom 4 Sides Input -->
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Top Side (3 Letters)</label>
-                        <input type="text" id="input-side-top" maxlength="3" placeholder="e.g. IHZ" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 uppercase font-mono text-center tracking-widest text-sm focus:ring-2 focus:ring-rose-400 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Right Side (3 Letters)</label>
-                        <input type="text" id="input-side-right" maxlength="3" placeholder="e.g. ADS" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 uppercase font-mono text-center tracking-widest text-sm focus:ring-2 focus:ring-rose-400 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Bottom Side (3 Letters)</label>
-                        <input type="text" id="input-side-bottom" maxlength="3" placeholder="e.g. VOR" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 uppercase font-mono text-center tracking-widest text-sm focus:ring-2 focus:ring-rose-400 outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Left Side (3 Letters)</label>
-                        <input type="text" id="input-side-left" maxlength="3" placeholder="e.g. MTU" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 uppercase font-mono text-center tracking-widest text-sm focus:ring-2 focus:ring-rose-400 outline-none">
-                    </div>
-                </div>
-
-                <!-- Par Setting & Strict Toggle -->
-                <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-200">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-700">Dictionary Mode</label>
-                        <span class="text-[11px] text-gray-500">Validate against built-in dictionary</span>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="toggle-dict-check" class="sr-only peer" checked>
-                        <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
-                    </label>
-                </div>
-            </div>
-
-            <div class="pt-4 border-t flex gap-2 mt-auto">
-                <button id="btn-apply-custom" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl shadow text-sm transition">
-                    Apply Puzzle
-                </button>
-            </div>
-        </div>
+  <div class="board-stage">
+    <div class="puzzle-box" id="puzzleBox">
+      <svg class="lines-svg" id="linesSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
     </div>
+  </div>
 
-    <!-- MODAL 2: Instructions & Local Proxy Guide -->
-    <div id="modal-help" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-100 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center border-b pb-3 mb-3">
-                <h3 class="font-serif-nyt text-xl font-bold text-gray-900">How to Play & Scraper Info</h3>
-                <button id="btn-close-help" class="text-gray-400 hover:text-gray-600 text-lg">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
+  <div class="controls-row">
+    <button class="action-btn" id="deleteBtn">⌫ Delete</button>
+    <button class="action-btn primary" id="submitBtn">✓ Submit Word</button>
+    <button class="action-btn" id="undoBtn">↺ Undo</button>
+    <button class="action-btn" id="resetBtn" title="Reset Board">⟳</button>
+  </div>
 
-            <div class="overflow-y-auto space-y-4 text-xs text-gray-700 pr-1">
-                <div>
-                    <h4 class="font-bold text-gray-900 text-sm mb-1">Official Rules:</h4>
-                    <ul class="list-disc pl-4 space-y-1">
-                        <li>Connect letters around the box to form words.</li>
-                        <li>Words must be at least <strong>3 letters</strong> long.</li>
-                        <li>Consecutive letters <strong>cannot</strong> come from the same side of the square.</li>
-                        <li>The last letter of a word becomes the <strong>first letter</strong> of the next word.</li>
-                        <li>Goal: Use all <strong>12 unique letters</strong> in as few words as possible!</li>
-                    </ul>
-                </div>
+  <div class="toast" id="toastMsg"></div>
 
-                <div class="border-t pt-3">
-                    <h4 class="font-bold text-gray-900 text-sm mb-1">Scraper & CORS Options:</h4>
-                    <p class="mb-2">
-                        This app automatically requests daily puzzle data from:
-                        <code class="bg-gray-100 px-1 py-0.5 rounded text-[11px] text-rose-600 font-mono">https://letterboxedanswers.com/letter-boxed-{month}-{day}-{year}-answers/</code>
-                    </p>
-                    <p class="mb-2">
-                        Because browsers block cross-origin requests (`file://` or distinct domains), the app cycles through public CORS proxies:
-                    </p>
-                    <ul class="list-disc pl-4 space-y-0.5 font-mono text-[11px] text-gray-600">
-                        <li>api.allorigins.win</li>
-                        <li>corsproxy.io</li>
-                        <li>api.codetabs.com</li>
-                    </ul>
-                </div>
-
-                <div class="border-t pt-3 bg-amber-50 p-3 rounded-xl border border-amber-200">
-                    <h4 class="font-bold text-amber-900 text-xs mb-1 flex items-center gap-1">
-                        <i class="fa-solid fa-lightbulb text-amber-600"></i> Local Usage / CORS Troubleshooting:
-                    </h4>
-                    <p class="text-[11px] text-amber-800 leading-relaxed">
-                        If running locally via <code class="bg-amber-100 px-1 rounded">file://</code> and proxy services are offline or rate-limited:
-                    </p>
-                    <ol class="list-decimal pl-4 space-y-1 text-[11px] text-amber-800 mt-1">
-                        <li>Use the built-in <strong>"Preset / Edit"</strong> button to load historical daily puzzles or type any custom letters.</li>
-                        <li>Launch your local browser with CORS disabled, or use a local HTTP server with CORS enabled.</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="pt-4 border-t mt-auto">
-                <button id="btn-dismiss-help" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-2 rounded-xl text-xs transition">
-                    Got it!
-                </button>
-            </div>
-        </div>
+  <div class="history-card">
+    <div class="history-header">
+      <span>SUBMITTED WORDS</span>
+      <span id="historyBadge">0 WORDS</span>
     </div>
+    <div class="word-chain" id="wordChain">—</div>
+  </div>
 
-    <!-- MODAL 3: Puzzle Solved Celebration -->
-    <div id="modal-victory" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center transform transition-all border-4 border-amber-400">
-            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3 text-3xl">
-                <i class="fa-solid fa-trophy"></i>
-            </div>
-            <h2 class="font-serif-nyt text-2xl font-bold text-gray-900 mb-1">Puzzle Solved!</h2>
-            <p class="text-xs text-gray-600 mb-4" id="victory-subtitle">You used all 12 letters!</p>
-
-            <div class="bg-gray-50 rounded-xl p-3 mb-4 text-xs space-y-1 text-gray-700 font-semibold border">
-                <div class="flex justify-between">
-                    <span>Your Words:</span>
-                    <strong id="vic-word-count" class="text-gray-900">2</strong>
-                </div>
-                <div class="flex justify-between">
-                    <span>Par Target:</span>
-                    <strong id="vic-par-target" class="text-gray-900">4</strong>
-                </div>
-                <div class="flex justify-between">
-                    <span>Status:</span>
-                    <strong id="vic-rating" class="text-rose-600">Great Job!</strong>
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <button id="btn-share-result" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl shadow text-xs flex items-center justify-center gap-2 transition">
-                    <i class="fa-solid fa-share-nodes"></i> Copy Results to Clipboard
-                </button>
-                <button id="btn-close-victory" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded-xl text-xs transition">
-                    Keep Playing
-                </button>
-            </div>
-        </div>
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <h3>Edit 4 Sides (3 letters each)</h3>
+      <div class="side-inputs">
+        <label>Top Side <input type="text" id="side0Input" maxlength="3" /></label>
+        <label>Right Side <input type="text" id="side1Input" maxlength="3" /></label>
+        <label>Bottom Side <input type="text" id="side2Input" maxlength="3" /></label>
+        <label>Left Side <input type="text" id="side3Input" maxlength="3" /></label>
+      </div>
+      <div class="modal-actions">
+        <button class="pill-btn" id="closeModalBtn">Cancel</button>
+        <button class="pill-btn" style="background:#1a1a1b;color:#fff;" id="saveSidesBtn">Apply</button>
+      </div>
     </div>
+  </div>
 
-    <!-- MAIN JAVASCRIPT LOGIC -->
-    <script>
-        /**
-         * NYT LETTER BOXED PUZZLE & SCRAPER APP ENGINE
-         */
+  <script>
+    const SIDE_COORDS = [
+      [{ x: 20, y: 0 }, { x: 50, y: 0 }, { x: 80, y: 0 }],
+      [{ x: 100, y: 20 }, { x: 100, y: 50 }, { x: 100, y: 80 }],
+      [{ x: 20, y: 100 }, { x: 50, y: 100 }, { x: 80, y: 100 }],
+      [{ x: 0, y: 20 }, { x: 0, y: 50 }, { x: 0, y: 80 }]
+    ];
 
-        // Preset Historical Puzzles (Offline / Backup dataset)
-        const PRESET_PUZZLES = [
-            {
-                date: "2026-11-24",
-                label: "Nov 24, 2026 (Today)",
-                sides: ["IHZ", "ADS", "VOR", "MTU"],
-                par: 2,
-                solutions: ["HAZARDOUS", "MITZVAH"]
-            },
-            {
-                date: "2026-11-23",
-                label: "Nov 23, 2026",
-                sides: ["IHZ", "ADS", "VOR", "MTU"],
-                par: 2,
-                solutions: ["HAZARDOUS", "MITZVAH"]
-            },
-            {
-                date: "2026-11-22",
-                label: "Nov 22, 2026",
-                sides: ["CLR", "TIA", "VUS", "ONW"],
-                par: 2,
-                solutions: ["ANVIL", "LAWCOURTS"]
-            },
-            {
-                date: "2026-11-21",
-                label: "Nov 21, 2026",
-                sides: ["PIT", "NOE", "RLC", "YAK"],
-                par: 2,
-                solutions: ["CALTROP", "PERNICKETY"]
-            },
-            {
-                date: "2025-11-21",
-                label: "Nov 21, 2025 (Requested)",
-                sides: ["DOU", "GHN", "TIM", "BRE"],
-                par: 2,
-                solutions: ["DOUGHNUT", "TIMBRE"]
-            },
-            {
-                date: "2026-11-19",
-                label: "Nov 19, 2026",
-                sides: ["CZU", "STO", "NEJ", "RIB"],
-                par: 2,
-                solutions: ["JUNCTIONS", "SUBZERO"]
-            },
-            {
-                date: "2026-11-18",
-                label: "Nov 18, 2026",
-                sides: ["ACP", "HOR", "DUG", "WTM"],
-                par: 2,
-                solutions: ["WATCHDOG", "GRUMP"]
-            }
-        ];
+    const PRESET_PUZZLES = [
+      {
+        date: "2025-11-21",
+        label: "Nov 21, 2025",
+        sides: ["HRA", "TPL", "GFY", "EIX"],
+        par: 2,
+        solutions: ["FLIGHTY", "YATRA"]
+      }
+    ];
 
-        // Core Dictionary subset for client-side offline validation (~1000 common words + expansion)
-        const BUILTIN_DICTIONARY = new Set([
-            "HAZARDOUS", "MITZVAH", "ANVIL", "LAWCOURTS", "CALTROP", "PERNICKETY",
-            "DOUGHNUT", "TIMBRE", "JUNCTIONS", "SUBZERO", "WATCHDOG", "GRUMP",
-            "LAWCOURT", "COURT", "ANVILS", "AFTERHAND", "DOGBOLT", "GRANDFATHER",
-            "OBLONG", "BELONG", "VISCOUNT", "TRAWL", "PIXEL", "LOQUACITY",
-            "EXPEL", "PACLITAXEL", "EXPLICATE", "CARNIVAL", "REINCORPORATE",
-            "TANKTOP", "PRINCELY", "PLANTLIKE", "ELECTROTYPE", "CITRONIZES",
-            "SUBJOIN", "SUBJUNCTION", "CONCERTIZES", "SCRUTINIZES", "ZEROES",
-            "GOPURAM", "AUTOGRAPH", "DOGWATCH", "CAT", "DOG", "OUT", "INTO",
-            "ABOUT", "ABOVE", "ACCEPT", "ACTION", "ACTIVE", "ACTOR", "ACTUAL",
-            "ADAPT", "ADD", "ADMIN", "ADMIT", "ADOPT", "ADULT", "ADVICE", "ADVISE",
-            "AFFECT", "AFFORD", "AFRAID", "AFTER", "AGAIN", "AGAINST", "AGE",
-            "AGENCY", "AGENDA", "AGENT", "AGREE", "AHEAD", "AID", "AIM", "AIR",
-            "AIRCRAFT", "AIRLINE", "AIRPORT", "ALBUM", "ALCOHOL", "ALIVE", "ALL",
-            "ALLOW", "ALMOST", "ALONE", "ALONG", "ALREADY", "ALSO", "ALTER",
-            "ALWAYS", "AMATEUR", "AMAZING", "AMONG", "AMOUNT", "ANCIENT", "ANGER",
-            "ANGLE", "ANGRY", "ANIMAL", "ANNUAL", "ANOTHER", "ANSWER", "ANXIETY",
-            "ANYBODY", "ANYMORE", "ANYONE", "ANYTHING", "ANYWAY", "APART",
-            "APOLOGY", "APPEAL", "APPEAR", "APPLE", "APPLY", "APPROACH", "APPROVE",
-            "AREA", "ARGUE", "AROUND", "ARRANGE", "ARRIVE", "ART", "ARTICLE",
-            "ARTIST", "ASPECT", "ASSIGN", "ASSIST", "ASSUME", "ASSURE", "ATHLETE",
-            "ATMOSPHERE", "ATTACH", "ATTACK", "ATTEMPT", "ATTEND", "ATTITUDE",
-            "ATTRACT", "AUTHOR", "AUTO", "AVAILABLE", "AVOID", "AWARD", "AWARE",
-            "AWAY", "AWFUL", "BABY", "BACK", "BAD", "BAG", "BAKE", "BALANCE",
-            "BALL", "BAND", "BANK", "BAR", "BARELY", "BARGAIN", "BARREL", "BASE",
-            "BASIC", "BASIS", "BASKET", "BAT", "BATH", "BATTERY", "BATTLE", "BEACH",
-            "BEAR", "BEAT", "BEAUTIFUL", "BECOME", "BED", "BEDROOM", "BEER",
-            "BEFORE", "BEGIN", "BEHALF", "BEHAVE", "BEHIND", "BELIEF", "BELIEVE",
-            "BELL", "BELOW", "BELT", "BENCH", "BEND", "BENEATH", "BENEFIT",
-            "BESIDE", "BEST", "BET", "BETTER", "BETWEEN", "BEYOND", "BICYCLE",
-            "BID", "BIG", "BIKE", "BILL", "BIND", "BIRD", "BIRTH", "BIT", "BITE",
-            "BLACK", "BLAME", "BLANK", "BLANKET", "BLAST", "BLEED", "BLEND",
-            "BLESS", "BLIND", "BLOCK", "BLOND", "BLOOD", "BLOW", "BLUE", "BOARD",
-            "BOAT", "BODY", "BOIL", "BOLD", "BOMB", "BOND", "BONE", "BONUS", "BOOK",
-            "BOOM", "BOOT", "BORDER", "BORED", "BORN", "BORROW", "BOSS", "BOTH",
-            "BOTHER", "BOTTLE", "BOTTOM", "BOUNCE", "BOUNDARY", "BOWL", "BOX",
-            "BOY", "BRAIN", "BRANCH", "BRAND", "BRAVE", "BREAD", "BREAK", "BREATH",
-            "BREEZE", "BRICK", "BRIDGE", "BRIEF", "BRIGHT", "BRING", "BROAD",
-            "BROKEN", "BROTHER", "BROWN", "BRUSH", "BUBBLE", "BUCKET", "BUDGET",
-            "BUFFER", "BUG", "BUILD", "BULB", "BULK", "BULLET", "BUNCH", "BURDEN",
-            "BUREAU", "BURN", "BURST", "BUS", "BUSH", "BUSINESS", "BUSY", "BUTT",
-            "BUTTER", "BUTTON", "BUY", "CABIN", "CABINET", "CABLE", "CAGE", "CAKE",
-            "CALCULATE", "CALL", "CALM", "CAMERA", "CAMP", "CAMPAIGN", "CAMPUS",
-            "CAN", "CANAL", "CANCEL", "CANCER", "CANDIDATE", "CANDLE", "CANDY",
-            "CANVAS", "CAP", "CAPABLE", "CAPITAL", "CAPTAIN", "CAPTURE", "CAR",
-            "CARD", "CARE", "CAREER", "CAREFUL", "CARELESS", "CARGO", "CARPET",
-            "CARROT", "CARRY", "CART", "CASE", "CASH", "CAST", "CASTLE", "CATALOG",
-            "CATCH", "CATEGORY", "CATTLE", "CAUSE", "CEILING", "CELL", "CEMENT",
-            "CENTER", "CENTURY", "CERTAIN", "CHAIN", "CHAIR", "CHAIRMAN",
-            "CHALLENGE", "CHAMBER", "CHANCE", "CHANGE", "CHANNEL", "CHAPTER",
-            "CHARACTER", "CHARGE", "CHARITY", "CHARMING", "CHART", "CHASE",
-            "CHEAP", "CHECK", "CHEEK", "CHEER", "CHEESE", "CHEF", "CHEMICAL",
-            "CHEST", "CHICKEN", "CHIEF", "CHILD", "CHIMNEY", "CHIP", "CHOICE",
-            "CHOIR", "CHOOSE", "CHOP", "CHURCH", "CIGARETTE", "CINEMA", "CIRCLE",
-            "CIRCUIT", "CIRCUMSTANCE", "CITIZEN", "CITY", "CIVIL", "CLAIM",
-            "CLASS", "CLASSIC", "CLASSROOM", "CLEAN", "CLEAR", "CLERK", "CLEVER",
-            "CLICK", "CLIENT", "CLIFF", "CLIMATE", "CLIMB", "CLINIC", "CLOCK",
-            "CLOSE", "CLOTH", "CLOTHES", "CLOTHING", "CLOUD", "CLUB", "CLUE",
-            "CLUSTER", "COACH", "COAL", "COAST", "COAT", "CODE", "COFFEE", "COIN",
-            "COLD", "COLLAPSE", "COLLAR", "COLLEAGUE", "COLLECT", "COLLEGE",
-            "COLONEL", "COLONY", "COLOR", "COLUMN", "COMB", "COMBINE", "COME",
-            "COMEDY", "COMFORT", "COMMAND", "COMMENT", "COMMERCE", "COMMISSION",
-            "COMMIT", "COMMITTEE", "COMMON", "COMMUNICATE", "COMMUNITY",
-            "COMPANY", "COMPARE", "COMPEL", "COMPETE", "COMPLAIN", "COMPLETE",
-            "COMPLEX", "COMPLICATE", "COMPOSE", "COMPOSITION", "COMPUTE",
-            "COMPUTER", "CONCENTRATE", "CONCEPT", "CONCERN", "CONCERT", "CONCLUDE",
-            "CONCLUSION", "CONCRETE", "CONDITION", "CONDUCT", "CONFERENCE",
-            "CONFIDENCE", "CONFIDENT", "CONFIRM", "CONFLICT", "CONFORM",
-            "CONFUSE", "CONGRESS", "CONNECT", "CONSIDER", "CONSIST", "CONSISTENT",
-            "CONSTANT", "CONSTRUCT", "CONSULT", "CONSUME", "CONTACT", "CONTAIN",
-            "CONTEMPORARY", "CONTENT", "CONTEST", "CONTEXT", "CONTINUE",
-            "CONTRACT", "CONTRARY", "CONTRAST", "CONTRIBUTE", "CONTROL",
-            "CONVENIENT", "CONVERSATION", "CONVERT", "CONVINCE", "COOK", "COOL",
-            "COOPERATE", "COPE", "COPPER", "COPY", "CORE", "CORN", "CORNER",
-            "CORRECT", "CORRESPOND", "COST", "COTTON", "COUCH", "COULD", "COUNCIL",
-            "COUNSEL", "COUNT", "COUNTER", "COUNTRY", "COUNTY", "COUPLE",
-            "COURAGE", "COURSE", "COURT", "COUSIN", "COVER", "COW", "CRASH",
-            "CRAWL", "CRAZY", "CREAM", "CREATE", "CREATION", "CREATIVE", "CREATURE",
-            "CREDIT", "CREEK", "CREW", "CRIME", "CRIMINAL", "CRISIS", "CRITERION",
-            "CRITIC", "CRITICAL", "CRITICISM", "CROP", "CROSS", "CROWD", "CROWN",
-            "CRUCIAL", "CRUDE", "CRUEL", "CRUISE", "CRUSH", "CRY", "CRYSTAL",
-            "CULTURAL", "CULTURE", "CUP", "CURE", "CURIOUS", "CURRENCY", "CURRENT",
-            "CURTAIN", "CURVE", "CUSTODY", "CUSTOM", "CUSTOMER", "CUT", "CYCLE"
-        ]);
+    const DOM = {
+      datePicker: document.getElementById("datePicker"),
+      statusBanner: document.getElementById("statusBanner"),
+      statusText: document.getElementById("statusText"),
+      retryBtn: document.getElementById("retryBtn"),
+      puzzleBox: document.getElementById("puzzleBox"),
+      linesSvg: document.getElementById("linesSvg"),
+      currentWordDisplay: document.getElementById("currentWordDisplay"),
+      toastMsg: document.getElementById("toastMsg"),
+      wordCountStat: document.getElementById("wordCountStat"),
+      letterCountStat: document.getElementById("letterCountStat"),
+      parStat: document.getElementById("parStat"),
+      wordChain: document.getElementById("wordChain"),
+      historyBadge: document.getElementById("historyBadge"),
+      editModal: document.getElementById("editModal")
+    };
 
-        // State Machine Object
-        const state = {
-            dateStr: "", // Format: YYYY-MM-DD
-            sides: ["IHZ", "ADS", "VOR", "MTU"], // 4 sides x 3 chars
-            par: 2,
-            letterNodes: [], // Array of 12 node objects { char, side, x, y }
-            nodePositions: {}, // Map char -> { side, index, x, y }
-            submittedWords: [],
-            currentDraft: "", // Currently typed letter string
-            currentDraftNodes: [], // Indices of nodes in current draft
-            usedLetters: new Set(),
-            dictCheck: true,
-            isSolved: false,
-            solutions: []
-        };
+    let state = {
+      sides: ["IHZ", "ADS", "VOR", "MTU"],
+      par: 2,
+      solutions: [],
+      submittedWords: [],
+      currentChain: []
+    };
 
-        // DOM Element Cache
-        const DOM = {
-            dateBadge: document.getElementById("date-display-badge"),
-            datePicker: document.getElementById("puzzle-date-picker"),
-            btnFetch: document.getElementById("btn-fetch-date"),
-            fetchIcon: document.getElementById("fetch-icon"),
-            btnOpenEdit: document.getElementById("btn-open-edit"),
-            btnOpenHelp: document.getElementById("btn-open-help"),
-            proxyStatusBar: document.getElementById("proxy-status-bar"),
-            proxyStatusBox: document.getElementById("proxy-status-box"),
-            proxyStatusText: document.getElementById("proxy-status-text"),
-            btnRetryProxy: document.getElementById("btn-retry-proxy"),
-            currentWordDisplay: document.getElementById("current-word-display"),
-            wordCountNum: document.getElementById("word-count-num"),
-            lettersUsedNum: document.getElementById("letters-used-num"),
-            parTargetNum: document.getElementById("par-target-num"),
-            linesGroup: document.getElementById("lines-group"),
-            nodesContainer: document.getElementById("nodes-container"),
-            btnDelete: document.getElementById("btn-delete"),
-            btnSubmit: document.getElementById("btn-submit"),
-            btnUndo: document.getElementById("btn-undo"),
-            btnRestart: document.getElementById("btn-restart"),
-            wordHistoryList: document.getElementById("word-history-list"),
-            wordsChainCount: document.getElementById("words-chain-count"),
-            // Modals
-            modalEdit: document.getElementById("modal-edit"),
-            btnCloseEdit: document.getElementById("btn-close-edit"),
-            presetPuzzlesSelect: document.getElementById("preset-puzzles-select"),
-            inputSideTop: document.getElementById("input-side-top"),
-            inputSideRight: document.getElementById("input-side-right"),
-            inputSideBottom: document.getElementById("input-side-bottom"),
-            inputSideLeft: document.getElementById("input-side-left"),
-            toggleDictCheck: document.getElementById("toggle-dict-check"),
-            btnApplyCustom: document.getElementById("btn-apply-custom"),
-            modalHelp: document.getElementById("modal-help"),
-            btnCloseHelp: document.getElementById("btn-close-help"),
-            btnDismissHelp: document.getElementById("btn-dismiss-help"),
-            modalVictory: document.getElementById("modal-victory"),
-            victorySubtitle: document.getElementById("victory-subtitle"),
-            vicWordCount: document.getElementById("vic-word-count"),
-            vicParTarget: document.getElementById("vic-par-target"),
-            vicRating: document.getElementById("vic-rating"),
-            btnShareResult: document.getElementById("btn-share-result"),
-            btnCloseVictory: document.getElementById("btn-close-victory")
-        };
+    function getTodayISO() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
 
-        // Initialize Application
-        window.addEventListener("DOMContentLoaded", () => {
-            initPresetsUI();
-            setTodayDateDefault();
-            setupEventListeners();
-            loadPuzzleForSelectedDate();
-        });
+    function showProxyStatus(kind, message) {
+      DOM.statusBanner.className = `status-banner status-${kind}`;
+      DOM.statusText.textContent = message;
+    }
 
-        // 1. INITIALIZATION & DATE SETUP
-        function setTodayDateDefault() {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const formatted = `${yyyy}-${mm}-${dd}`;
-            DOM.datePicker.value = formatted;
-            state.dateStr = formatted;
+    function showToast(msg, duration = 2400) {
+      DOM.toastMsg.textContent = msg;
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => { DOM.toastMsg.textContent = ""; }, duration);
+    }
+
+    function applyNewPuzzle(sides, par = 2, _dateString = "", solutions = []) {
+      state.sides = sides.map(s => String(s).toUpperCase());
+      state.par = par || 2;
+      state.solutions = Array.isArray(solutions) ? solutions.map(w => String(w).toUpperCase()) : [];
+      state.submittedWords = [];
+      state.currentChain = [];
+      renderBoard();
+    }
+
+    async function fetchPuzzleFromWeb(dateString) {
+      const d = new Date(dateString + "T00:00:00");
+      const yearNum = d.getFullYear();
+      const monthStr = String(d.getMonth() + 1).padStart(2, "0");
+      const dayStr = String(d.getDate()).padStart(2, "0");
+
+      const targetUrl =
+        `https://script.google.com/macros/s/AKfycbwkKXlaVNdEPuVxOpyBNraae-gWM8ltrzNHFs0EYYKHl8bOx-1Au1If1wEHm_Bcr8hMCg/exec?url=${yearNum}${monthStr}${dayStr}`;
+
+      console.log(targetUrl);
+      showProxyStatus("fetching", "Fetching puzzle...");
+
+      const presetMatch = PRESET_PUZZLES.find(p => p.date === dateString);
+      let puzzleData = null;
+
+      try {
+        const resp = await fetch(targetUrl, { cache: "no-store" });
+        if (resp.ok) {
+          puzzleData = await resp.json();
+          console.log(puzzleData);
+        }
+      } catch (err) {
+        console.warn("Fetch failed:", err);
+      }
+
+      if (
+        puzzleData &&
+        puzzleData.data &&
+        Array.isArray(puzzleData.data.fjallets) &&
+        puzzleData.data.fjallets.length === 6
+      ) {
+        const sides = puzzleData.data.fjallets.slice(0, 4).map(s => String(s).toUpperCase());
+        const solutions = puzzleData.data.fjallets.slice(4).map(s => String(s).toUpperCase());
+
+        showProxyStatus("success", "Successfully loaded!");
+        applyNewPuzzle(sides, presetMatch?.par || 2, dateString, solutions);
+        return;
+      }
+
+      if (presetMatch) {
+        showProxyStatus(
+          "info",
+          `Fetch failed. Loaded pre-cached puzzle for ${presetMatch.label}.`
+        );
+        applyNewPuzzle(
+          presetMatch.sides,
+          presetMatch.par,
+          dateString,
+          presetMatch.solutions
+        );
+      } else {
+        showProxyStatus(
+          "error",
+          `Could not fetch live puzzle for ${dateString}. Using fallback grid.`
+        );
+        applyNewPuzzle(["IHZ", "ADS", "VOR", "MTU"], 2, dateString, []);
+      }
+    }
+
+    function getNodeMeta(nodeIdx) {
+      const side = Math.floor(nodeIdx / 3);
+      const pos = nodeIdx % 3;
+      const letter = state.sides[side][pos];
+      const coord = SIDE_COORDS[side][pos];
+      return { nodeIdx, side, pos, letter, x: coord.x, y: coord.y };
+    }
+
+    function renderBoard() {
+      DOM.puzzleBox.querySelectorAll(".letter-node").forEach(el => el.remove());
+
+      const usedSet = new Set();
+      state.submittedWords.forEach(wordNodes => wordNodes.forEach(idx => usedSet.add(idx)));
+
+      const currentSet = new Set(state.currentChain);
+      const lastActiveIdx = state.currentChain.length > 0
+        ? state.currentChain[state.currentChain.length - 1]
+        : (state.submittedWords.length > 0
+            ? state.submittedWords[state.submittedWords.length - 1].slice(-1)[0]
+            : -1);
+
+      for (let i = 0; i < 12; i++) {
+        const meta = getNodeMeta(i);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "letter-node";
+        btn.textContent = meta.letter;
+        btn.style.left = `${meta.x}%`;
+        btn.style.top = `${meta.y}%`;
+
+        if (i === lastActiveIdx) {
+          btn.classList.add("active-last");
+        } else if (currentSet.has(i)) {
+          btn.classList.add("in-current");
+        } else if (usedSet.has(i)) {
+          btn.classList.add("used");
         }
 
-        function initPresetsUI() {
-            DOM.presetPuzzlesSelect.innerHTML = "";
-            PRESET_PUZZLES.forEach((p, idx) => {
-                const opt = document.createElement("option");
-                opt.value = idx;
-                opt.textContent = `${p.label} [${p.sides.join(" - ")}]`;
-                DOM.presetPuzzlesSelect.appendChild(opt);
-            });
+        btn.addEventListener("click", () => handleNodeSelect(i));
+        DOM.puzzleBox.appendChild(btn);
+      }
+
+      renderLines();
+      renderStats();
+    }
+
+    function renderLines() {
+      DOM.linesSvg.innerHTML = "";
+
+      state.submittedWords.forEach(wordNodes => {
+        for (let i = 0; i < wordNodes.length - 1; i++) {
+          const a = getNodeMeta(wordNodes[i]);
+          const b = getNodeMeta(wordNodes[i + 1]);
+          addSvgLine(a.x, a.y, b.x, b.y, "#f4b8ae", false);
         }
+      });
 
-        // 2. SCRAPER & CORS PROXY ENGINE
-        async function fetchPuzzleFromWeb(dateString) {
-            const d = new Date(dateString + "T00:00:00");
-            const yearNum = d.getFullYear();
-            const monthStr = String(d.getMonth() + 1).padStart(2, "0");
-            const dayStr = String(d.getDate()).padStart(2, "0");
+      for (let i = 0; i < state.currentChain.length - 1; i++) {
+        const a = getNodeMeta(state.currentChain[i]);
+        const b = getNodeMeta(state.currentChain[i + 1]);
+        addSvgLine(a.x, a.y, b.x, b.y, "#e86f5e", true);
+      }
+    }
 
-            const targetUrl =
-                `https://script.google.com/macros/s/AKfycbwkKXlaVNdEPuVxOpyBNraae-gWM8ltrzNHFs0EYYKHl8bOx-1Au1If1wEHm_Bcr8hMCg/exec?url=${yearNum}${monthStr}${dayStr}`;
+    function addSvgLine(x1, y1, x2, y2, color, dashed) {
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", x1);
+      line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2);
+      line.setAttribute("y2", y2);
+      line.setAttribute("stroke", color);
+      line.setAttribute("stroke-width", "1.4");
+      line.setAttribute("stroke-linecap", "round");
+      if (dashed) line.setAttribute("stroke-dasharray", "2.2, 1.8");
+      DOM.linesSvg.appendChild(line);
+    }
 
-            console.log(targetUrl);
+    function renderStats() {
+      DOM.currentWordDisplay.textContent = state.currentChain.map(idx => getNodeMeta(idx).letter).join("");
 
-            showProxyStatus("fetching", "Fetching puzzle...");
-            DOM.fetchIcon.classList.add("fa-spin");
+      const allUsed = new Set();
+      state.submittedWords.forEach(w => w.forEach(idx => allUsed.add(idx)));
+      state.currentChain.forEach(idx => allUsed.add(idx));
 
-            const presetMatch = PRESET_PUZZLES.find(p => p.date === dateString);
+      DOM.wordCountStat.textContent = `Words: ${state.submittedWords.length}`;
+      DOM.letterCountStat.textContent = `Letters: ${allUsed.size}/12`;
+      DOM.parStat.textContent = `Par: ${state.par} words`;
 
-            let puzzleData = null;
+      const wordsText = state.submittedWords.map(w => w.map(idx => getNodeMeta(idx).letter).join(""));
+      DOM.wordChain.textContent = wordsText.length ? wordsText.join(" → ") : "—";
+      DOM.historyBadge.textContent = `${wordsText.length} WORD${wordsText.length === 1 ? "" : "S"}`;
+    }
 
-            try {
-                const resp = await fetch(targetUrl, { cache: "no-store" });
-
-                if (resp.ok) {
-                    puzzleData = await resp.json();
-                    console.log(puzzleData);
-                }
-            } catch (err) {
-                console.warn("Fetch failed:", err);
-            }
-
-            DOM.fetchIcon.classList.remove("fa-spin");
-
-            if (
-                puzzleData &&
-                puzzleData.data &&
-                Array.isArray(puzzleData.data.fjallets) &&
-                puzzleData.data.fjallets.length === 6
-            ) {
-                const sides = puzzleData.data.fjallets.slice(0, 4);
-                const solutions = puzzleData.data.fjallets.slice(4);
-
-                showProxyStatus("success", "Successfully loaded!");
-
-                applyNewPuzzle(
-                    sides,
-                    2,             // or whatever par should be
-                    dateString,
-                    solutions
-                );
-
-                return;
-            }
-
-            // Fallback to preset
-            if (presetMatch) {
-                showProxyStatus(
-                    "info",
-                    `Fetch failed. Loaded pre-cached puzzle for ${presetMatch.label}.`
-                );
-
-                applyNewPuzzle(
-                    presetMatch.sides,
-                    presetMatch.par,
-                    dateString,
-                    presetMatch.solutions
-                );
-            } else {
-                showProxyStatus(
-                    "error",
-                    `Could not fetch live puzzle for ${dateString}. Using fallback grid.`
-                );
-
-                applyNewPuzzle(
-                    ["IHZ", "ADS", "VOR", "MTU"],
-                    2,
-                    dateString,
-                    []
-                );
-            }
+    function handleNodeSelect(nodeIdx) {
+      const nextMeta = getNodeMeta(nodeIdx);
+      if (state.currentChain.length > 0) {
+        const prevMeta = getNodeMeta(state.currentChain[state.currentChain.length - 1]);
+        if (prevMeta.nodeIdx === nextMeta.nodeIdx) return;
+        if (prevMeta.side === nextMeta.side) {
+          showToast("Cannot connect letters on the same side");
+          return;
         }
+      }
+      state.currentChain.push(nodeIdx);
+      renderBoard();
+    }
 
+    function deleteLastLetter() {
+      const minLen = state.submittedWords.length > 0 ? 1 : 0;
+      if (state.currentChain.length > minLen) {
+        state.currentChain.pop();
+        renderBoard();
+      } else if (state.submittedWords.length > 0) {
+        showToast("Use Undo to remove the previous word");
+      }
+    }
 
-        function showProxyStatus(type, msg) {
-            DOM.proxyStatusBar.classList.remove("hidden");
-            DOM.proxyStatusBox.className = "text-xs px-3 py-1.5 rounded-lg flex items-center justify-between shadow-sm border ";
-            
-            if (type === "success") {
-                DOM.proxyStatusBox.classList.add("bg-emerald-50", "text-emerald-800", "border-emerald-200");
-            } else if (type === "fetching") {
-                DOM.proxyStatusBox.classList.add("bg-blue-50", "text-blue-800", "border-blue-200");
-            } else if (type === "info") {
-                DOM.proxyStatusBox.classList.add("bg-amber-50", "text-amber-800", "border-amber-200");
-            } else {
-                DOM.proxyStatusBox.classList.add("bg-rose-50", "text-rose-800", "border-rose-200");
-            }
-            DOM.proxyStatusText.textContent = msg;
+    function submitWord() {
+      if (state.currentChain.length < 3) {
+        showToast("Words must be at least 3 letters long");
+        return;
+      }
+      const lastNodeIdx = state.currentChain[state.currentChain.length - 1];
+      state.submittedWords.push([...state.currentChain]);
+      state.currentChain = [lastNodeIdx];
 
-            setTimeout(() => {
-                if (type === "success") {
-                    DOM.proxyStatusBar.classList.add("hidden");
-                }
-            }, 6000);
+      const allUsed = new Set();
+      state.submittedWords.forEach(w => w.forEach(idx => allUsed.add(idx)));
+      renderBoard();
+
+      if (allUsed.size === 12) {
+        showToast(`🎉 Solved in ${state.submittedWords.length} words!`, 4000);
+      }
+    }
+
+    function undoWord() {
+      if (state.submittedWords.length === 0) {
+        state.currentChain = [];
+        renderBoard();
+        return;
+      }
+      state.currentChain = [...state.submittedWords.pop()];
+      renderBoard();
+    }
+
+    function resetGame() {
+      state.submittedWords = [];
+      state.currentChain = [];
+      renderBoard();
+    }
+
+    document.addEventListener("keydown", e => {
+      if (DOM.editModal.classList.contains("open")) return;
+      const key = e.key.toUpperCase();
+      if (key === "BACKSPACE") {
+        e.preventDefault();
+        deleteLastLetter();
+      } else if (key === "ENTER") {
+        e.preventDefault();
+        submitWord();
+      } else if (/^[A-Z]$/.test(key)) {
+        const idx = state.sides.join("").indexOf(key);
+        if (idx !== -1) handleNodeSelect(idx);
+      }
+    });
+
+    document.getElementById("deleteBtn").addEventListener("click", deleteLastLetter);
+    document.getElementById("submitBtn").addEventListener("click", submitWord);
+    document.getElementById("undoBtn").addEventListener("click", undoWord);
+    document.getElementById("resetBtn").addEventListener("click", resetGame);
+    DOM.retryBtn.addEventListener("click", () => fetchPuzzleFromWeb(DOM.datePicker.value));
+
+    document.getElementById("hintBtn").addEventListener("click", () => {
+      if (state.solutions && state.solutions.length) {
+        showToast(`Solution words: ${state.solutions.join(" → ")}`, 4000);
+      } else {
+        showToast(`Target Par: ${state.par} words`);
+      }
+    });
+
+    document.getElementById("openEditBtn").addEventListener("click", () => {
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`side${i}Input`).value = state.sides[i];
+      }
+      DOM.editModal.classList.add("open");
+    });
+
+    document.getElementById("closeModalBtn").addEventListener("click", () => {
+      DOM.editModal.classList.remove("open");
+    });
+
+    document.getElementById("saveSidesBtn").addEventListener("click", () => {
+      const nextSides = [];
+      for (let i = 0; i < 4; i++) {
+        const val = document.getElementById(`side${i}Input`).value.toUpperCase().replace(/[^A-Z]/g, "");
+        if (val.length !== 3) {
+          alert("Each of the 4 sides must contain exactly 3 letters.");
+          return;
         }
-
-        // 3. GAME STATE & UI SETUP
-        function applyNewPuzzle(sidesArray, par, dateStr, solutions = []) {
-            state.sides = sidesArray.map(s => s.toUpperCase());
-            state.par = par || 2;
-            state.dateStr = dateStr;
-            state.submittedWords = [];
-            state.currentDraft = "";
-            state.currentDraftNodes = [];
-            state.usedLetters.clear();
-            state.isSolved = false;
-            state.solutions = solutions;
-
-            // Format date for badge
-            const d = new Date(dateStr + "T00:00:00");
-            const dateOptions = { month: 'short', day: 'numeric', year: 'numeric' };
-            DOM.dateBadge.textContent = d.toLocaleDateString('en-US', dateOptions);
-
-            DOM.parTargetNum.textContent = state.par;
-            DOM.wordCountNum.textContent = "0";
-            DOM.lettersUsedNum.textContent = "0";
-            DOM.currentWordDisplay.textContent = "";
-
-            buildLetterNodeGeometry();
-            renderNodes();
-            renderLines();
-            renderSubmittedWordsList();
-        }
-
-        // Build Cartesian X/Y coordinates for 12 nodes along the square border
-        // SVG ViewBox is 0 0 400 400. Square is 40 40 320 320 (inset by 40px for circle radius)
-        function buildLetterNodeGeometry() {
-            state.letterNodes = [];
-            state.nodePositions = {};
-
-            const min = 40;
-            const max = 360;
-            const step = (max - min) / 4; // 80px gaps
-
-            // Side 0: TOP (Left to Right) -> Y = 40, X = 120, 200, 280
-            const topChars = state.sides[0].split('');
-            topChars.forEach((char, i) => {
-                const node = { char, side: 0, index: 0 * 3 + i, x: min + (i + 1) * step, y: min };
-                state.letterNodes.push(node);
-                state.nodePositions[char] = node;
-            });
-
-            // Side 1: RIGHT (Top to Bottom) -> X = 360, Y = 120, 200, 280
-            const rightChars = state.sides[1].split('');
-            rightChars.forEach((char, i) => {
-                const node = { char, side: 1, index: 1 * 3 + i, x: max, y: min + (i + 1) * step };
-                state.letterNodes.push(node);
-                state.nodePositions[char] = node;
-            });
-
-            // Side 2: BOTTOM (Right to Left) -> Y = 360, X = 280, 200, 120
-            const bottomChars = state.sides[2].split('');
-            bottomChars.forEach((char, i) => {
-                const node = { char, side: 2, index: 2 * 3 + i, x: max - (i + 1) * step, y: max };
-                state.letterNodes.push(node);
-                state.nodePositions[char] = node;
-            });
-
-            // Side 3: LEFT (Bottom to Top) -> X = 40, Y = 280, 200, 120
-            const leftChars = state.sides[3].split('');
-            leftChars.forEach((char, i) => {
-                const node = { char, side: 3, index: 3 * 3 + i, x: min, y: max - (i + 1) * step };
-                state.letterNodes.push(node);
-                state.nodePositions[char] = node;
-            });
-        }
-
-        // Render Circular Letter Nodes overlay HTML inside .box-container
-        function renderNodes() {
-            DOM.nodesContainer.innerHTML = "";
-
-            state.letterNodes.forEach(node => {
-                // Convert SVG viewBox % coordinates to relative % CSS top/left
-                const leftPercent = (node.x / 400) * 100;
-                const topPercent = (node.y / 400) * 100;
-
-                const circleBtn = document.createElement("button");
-                circleBtn.dataset.index = node.index;
-                circleBtn.dataset.char = node.char;
-
-                // Base style for nodes
-                circleBtn.className = `letter-node absolute w-11 h-11 md:w-12 md:h-12 -ml-5.5 -mt-5.5 md:-ml-6 md:-mt-6 rounded-full bg-white text-gray-900 font-serif-nyt text-lg md:text-xl font-bold flex items-center justify-center border-2 border-gray-800 shadow-md cursor-pointer z-30`;
-                circleBtn.style.left = `${leftPercent}%`;
-                circleBtn.style.top = `${topPercent}%`;
-                circleBtn.textContent = node.char;
-
-                // Update node highlights
-                if (state.usedLetters.has(node.char)) {
-                    circleBtn.classList.add("used");
-                }
-
-                // First letter of draft highlight
-                if (state.currentDraftNodes.length > 0 && state.currentDraftNodes[0] === node.index) {
-                    circleBtn.classList.add("active-start");
-                }
-
-                circleBtn.addEventListener("click", () => handleNodeClick(node));
-                DOM.nodesContainer.appendChild(circleBtn);
-            });
-        }
-
-        // Render SVG lines (Committed solid lines + Active draft dashed line)
-        function renderLines() {
-            DOM.linesGroup.innerHTML = "";
-
-            // 1. Draw Committed Words Lines
-            let fullWordPath = [];
-            state.submittedWords.forEach(word => {
-                const nodeIndices = word.split('').map(c => state.nodePositions[c].index);
-                fullWordPath.push(...nodeIndices);
-            });
-
-            for (let i = 0; i < fullWordPath.length - 1; i++) {
-                const n1 = state.letterNodes[fullWordPath[i]];
-                const n2 = state.letterNodes[fullWordPath[i + 1]];
-                
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute("x1", n1.x);
-                line.setAttribute("y1", n1.y);
-                line.setAttribute("x2", n2.x);
-                line.setAttribute("y2", n2.y);
-                line.setAttribute("class", "line-committed");
-                DOM.linesGroup.appendChild(line);
-            }
-
-            // 2. Draw Active Draft Word Lines
-            for (let i = 0; i < state.currentDraftNodes.length - 1; i++) {
-                const n1 = state.letterNodes[state.currentDraftNodes[i]];
-                const n2 = state.letterNodes[state.currentDraftNodes[i + 1]];
-
-                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                line.setAttribute("x1", n1.x);
-                line.setAttribute("y1", n1.y);
-                line.setAttribute("x2", n2.x);
-                line.setAttribute("y2", n2.y);
-                line.setAttribute("class", "line-active");
-                DOM.linesGroup.appendChild(line);
-            }
-        }
-
-        // 4. INTERACTION LOGIC & GAME RULES
-        function handleNodeClick(node) {
-            // Rule 1: Cannot select consecutive letters on the SAME SIDE
-            if (state.currentDraftNodes.length > 0) {
-                const lastNodeIndex = state.currentDraftNodes[state.currentDraftNodes.length - 1];
-                const lastNode = state.letterNodes[lastNodeIndex];
-
-                if (node.side === lastNode.side) {
-                    triggerNodeError(node.index, "Cannot use letters on the same side consecutively!");
-                    return;
-                }
-            } else if (state.submittedWords.length > 0) {
-                // Rule 3: If starting a new word, it MUST start with the last letter of the previous word
-                const prevWord = state.submittedWords[state.submittedWords.length - 1];
-                const requiredStartChar = prevWord.slice(-1);
-
-                if (node.char !== requiredStartChar) {
-                    showToast(`Word must start with '${requiredStartChar}'!`);
-                    // Auto switch to required start char
-                    const reqNode = state.nodePositions[requiredStartChar];
-                    if (reqNode) {
-                        state.currentDraft = reqNode.char;
-                        state.currentDraftNodes = [reqNode.index];
-                        // If clicked node is valid after reqNode, add it too
-                        if (node.side !== reqNode.side) {
-                            state.currentDraft += node.char;
-                            state.currentDraftNodes.push(node.index);
-                        }
-                    }
-                    updateDraftDisplay();
-                    return;
-                }
-            }
-
-            // Append letter to draft
-            state.currentDraft += node.char;
-            state.currentDraftNodes.push(node.index);
-            updateDraftDisplay();
-        }
-
-        function triggerNodeError(nodeIndex, msg) {
-            showToast(msg);
-            const btn = DOM.nodesContainer.querySelector(`[data-index="${nodeIndex}"]`);
-            if (btn) {
-                btn.classList.add("shake");
-                setTimeout(() => btn.classList.remove("shake"), 400);
-            }
-        }
-
-        function handlePhysicalKey(key) {
-            const char = key.toUpperCase();
-            if (char.length === 1 && char >= 'A' && char <= 'Z') {
-                const node = state.nodePositions[char];
-                if (node) {
-                    handleNodeClick(node);
-                } else {
-                    showToast(`Letter '${char}' is not in today's box!`);
-                }
-            } else if (key === "Backspace") {
-                deleteLastDraftLetter();
-            } else if (key === "Enter") {
-                submitCurrentWord();
-            }
-        }
-
-        function deleteLastDraftLetter() {
-            if (state.currentDraft.length > 0) {
-                // If there are submitted words, don't delete the mandatory starting letter unless deleting rest
-                const prevWord = state.submittedWords[state.submittedWords.length - 1];
-                const minLen = (state.submittedWords.length > 0) ? 1 : 0;
-
-                if (state.currentDraft.length > minLen) {
-                    state.currentDraft = state.currentDraft.slice(0, -1);
-                    state.currentDraftNodes.pop();
-                    updateDraftDisplay();
-                } else if (state.submittedWords.length > 0 && state.currentDraft.length === 1) {
-                    state.currentDraft = "";
-                    state.currentDraftNodes = [];
-                    updateDraftDisplay();
-                }
-            }
-        }
-
-        function updateDraftDisplay() {
-            // Auto-insert required start letter if starting fresh word after previous submission
-            if (state.currentDraft.length === 0 && state.submittedWords.length > 0) {
-                const prevWord = state.submittedWords[state.submittedWords.length - 1];
-                const reqChar = prevWord.slice(-1);
-                const reqNode = state.nodePositions[reqChar];
-                if (reqNode) {
-                    state.currentDraft = reqChar;
-                    state.currentDraftNodes = [reqNode.index];
-                }
-            }
-
-            DOM.currentWordDisplay.textContent = state.currentDraft;
-            renderNodes();
-            renderLines();
-        }
-
-        async function submitCurrentWord() {
-            const word = state.currentDraft.trim().toUpperCase();
-
-            // Rule Check A: Min 3 letters
-            if (word.length < 3) {
-                showToast("Words must be at least 3 letters long!");
-                return;
-            }
-
-            // Rule Check B: Start letter continuity
-            if (state.submittedWords.length > 0) {
-                const prevWord = state.submittedWords[state.submittedWords.length - 1];
-                const reqChar = prevWord.slice(-1);
-                if (word.charAt(0) !== reqChar) {
-                    showToast(`Word must start with '${reqChar}'!`);
-                    return;
-                }
-            }
-
-            // Rule Check C: Dictionary lookup (if enabled)
-            if (state.dictCheck) {
-                const isValid = await validateWordInDictionary(word);
-                if (!isValid) {
-                    showToast(`'${word}' is not in the dictionary!`);
-                    return;
-                }
-            }
-
-            // Accept Word!
-            state.submittedWords.push(word);
-            word.split('').forEach(c => state.usedLetters.add(c));
-
-            // Reset draft to last letter of accepted word
-            const lastChar = word.slice(-1);
-            const lastNode = state.nodePositions[lastChar];
-            state.currentDraft = lastChar;
-            state.currentDraftNodes = [lastNode.index];
-
-            DOM.wordCountNum.textContent = state.submittedWords.length;
-            DOM.lettersUsedNum.textContent = state.usedLetters.size;
-
-            renderSubmittedWordsList();
-            updateDraftDisplay();
-
-            // Check Win Condition: All 12 unique letters used!
-            if (state.usedLetters.size === 12) {
-                handleVictory();
-            }
-        }
-
-        async function validateWordInDictionary(word) {
-            // 1. Local Builtin Set
-            if (BUILTIN_DICTIONARY.has(word)) return true;
-
-            // 2. Online Free Dictionary API
-            try {
-                const resp = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word.toLowerCase()}`);
-                if (resp.ok) {
-                    return true;
-                }
-            } catch (err) {
-                // If offline API fails, fallback to true if offline dict check disabled
-                console.warn("Dictionary API unreachable:", err);
-            }
-            return false;
-        }
-
-        function undoLastWord() {
-            if (state.submittedWords.length > 0) {
-                state.submittedWords.pop();
-                
-                // Recalculate used letters
-                state.usedLetters.clear();
-                state.submittedWords.forEach(w => {
-                    w.split('').forEach(c => state.usedLetters.add(c));
-                });
-
-                DOM.wordCountNum.textContent = state.submittedWords.length;
-                DOM.lettersUsedNum.textContent = state.usedLetters.size;
-
-                if (state.submittedWords.length > 0) {
-                    const lastWord = state.submittedWords[state.submittedWords.length - 1];
-                    const lastChar = lastWord.slice(-1);
-                    const lastNode = state.nodePositions[lastChar];
-                    state.currentDraft = lastChar;
-                    state.currentDraftNodes = [lastNode.index];
-                } else {
-                    state.currentDraft = "";
-                    state.currentDraftNodes = [];
-                }
-
-                renderSubmittedWordsList();
-                updateDraftDisplay();
-                showToast("Last word undone.");
-            }
-        }
-
-        function restartPuzzle() {
-            state.submittedWords = [];
-            state.currentDraft = "";
-            state.currentDraftNodes = [];
-            state.usedLetters.clear();
-            state.isSolved = false;
-
-            DOM.wordCountNum.textContent = "0";
-            DOM.lettersUsedNum.textContent = "0";
-
-            renderSubmittedWordsList();
-            updateDraftDisplay();
-            showToast("Puzzle reset.");
-        }
-
-        function renderSubmittedWordsList() {
-            DOM.wordsChainCount.textContent = `${state.submittedWords.length} word${state.submittedWords.length === 1 ? '' : 's'}`;
-            DOM.wordHistoryList.innerHTML = "";
-
-            if (state.submittedWords.length === 0) {
-                DOM.wordHistoryList.innerHTML = `<span class="text-xs text-gray-500 italic">No words submitted yet. Tap letters or type to begin!</span>`;
-                return;
-            }
-
-            state.submittedWords.forEach((w, idx) => {
-                const pill = document.createElement("span");
-                pill.className = "bg-rose-100 text-rose-900 border border-rose-300 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm";
-                pill.innerHTML = `<span class="text-rose-500 font-mono text-[10px]">${idx + 1}.</span> ${w}`;
-                DOM.wordHistoryList.appendChild(pill);
-            });
-        }
-
-        // 5. VICTORY & CONFETTI
-        function handleVictory() {
-            state.isSolved = true;
-            triggerConfetti();
-
-            DOM.vicWordCount.textContent = state.submittedWords.length;
-            DOM.vicParTarget.textContent = state.par;
-
-            if (state.submittedWords.length <= state.par) {
-                DOM.vicRating.textContent = "Genius! Under Par! 🌟";
-                DOM.victorySubtitle.textContent = `Incredible! Solved in ${state.submittedWords.length} words (Par ${state.par})!`;
-            } else {
-                DOM.vicRating.textContent = "Solved!";
-                DOM.victorySubtitle.textContent = `Great job! You used all 12 letters!`;
-            }
-
-            DOM.modalVictory.classList.remove("hidden");
-        }
-
-        function triggerConfetti() {
-            const canvas = document.getElementById("confetti-canvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            const particles = [];
-            const colors = ["#fa9a8d", "#2563eb", "#10b981", "#f59e0b", "#ec4899"];
-
-            for (let i = 0; i < 120; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height - canvas.height,
-                    size: Math.random() * 8 + 4,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    vy: Math.random() * 3 + 2,
-                    vx: Math.random() * 2 - 1,
-                    rot: Math.random() * 360
-                });
-            }
-
-            let animationId;
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.y += p.vy;
-                    p.x += p.vx;
-                    p.rot += 2;
-                    ctx.save();
-                    ctx.translate(p.x, p.y);
-                    ctx.rotate((p.rot * Math.PI) / 180);
-                    ctx.fillStyle = p.color;
-                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-                    ctx.restore();
-                });
-
-                if (particles.some(p => p.y < canvas.height)) {
-                    animationId = requestAnimationFrame(animate);
-                }
-            }
-            animate();
-        }
-
-        // 6. HELPER TOAST & EVENT LISTENERS
-        function showToast(msg) {
-            const toast = document.createElement("div");
-            toast.className = "toast bg-gray-900 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xl border border-gray-700 pointer-events-auto flex items-center gap-2";
-            toast.innerHTML = `<i class="fa-solid fa-circle-info text-rose-400"></i> ${msg}`;
-            DOM.toastContainer.appendChild(toast);
-
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 2500);
-        }
-
-        function loadPuzzleForSelectedDate() {
-            const selectedDate = DOM.datePicker.value;
-            if (selectedDate) {
-                fetchPuzzleFromWeb(selectedDate);
-            }
-        }
-
-        function setupEventListeners() {
-            // Header Buttons
-            DOM.btnFetch.addEventListener("click", loadPuzzleForSelectedDate);
-            DOM.datePicker.addEventListener("change", loadPuzzleForSelectedDate);
-
-            // Action Buttons
-            DOM.btnDelete.addEventListener("click", deleteLastDraftLetter);
-            DOM.btnSubmit.addEventListener("click", submitCurrentWord);
-            DOM.btnUndo.addEventListener("click", undoLastWord);
-            DOM.btnRestart.addEventListener("click", restartPuzzle);
-
-            // Keyboards
-            window.addEventListener("keydown", (e) => {
-                // Ignore keydowns when typing in input modals
-                if (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT") {
-                    return;
-                }
-                handlePhysicalKey(e.key);
-            });
-
-            // Modal 1: Edit & Custom
-            DOM.btnOpenEdit.addEventListener("click", () => {
-                DOM.inputSideTop.value = state.sides[0] || "";
-                DOM.inputSideRight.value = state.sides[1] || "";
-                DOM.inputSideBottom.value = state.sides[2] || "";
-                DOM.inputSideLeft.value = state.sides[3] || "";
-                DOM.toggleDictCheck.checked = state.dictCheck;
-                DOM.modalEdit.classList.remove("hidden");
-            });
-
-            DOM.btnCloseEdit.addEventListener("click", () => DOM.modalEdit.classList.add("hidden"));
-
-            DOM.presetPuzzlesSelect.addEventListener("change", (e) => {
-                const idx = parseInt(e.target.value, 10);
-                const p = PRESET_PUZZLES[idx];
-                if (p) {
-                    DOM.inputSideTop.value = p.sides[0];
-                    DOM.inputSideRight.value = p.sides[1];
-                    DOM.inputSideBottom.value = p.sides[2];
-                    DOM.inputSideLeft.value = p.sides[3];
-                    DOM.datePicker.value = p.date;
-                }
-            });
-
-            DOM.btnApplyCustom.addEventListener("click", () => {
-                const top = DOM.inputSideTop.value.trim().toUpperCase();
-                const right = DOM.inputSideRight.value.trim().toUpperCase();
-                const bottom = DOM.inputSideBottom.value.trim().toUpperCase();
-                const left = DOM.inputSideLeft.value.trim().toUpperCase();
-
-                if (top.length !== 3 || right.length !== 3 || bottom.length !== 3 || left.length !== 3) {
-                    showToast("Each side must contain exactly 3 letters!");
-                    return;
-                }
-
-                state.dictCheck = DOM.toggleDictCheck.checked;
-                DOM.modalEdit.classList.add("hidden");
-                applyNewPuzzle([top, right, bottom, left], 2, DOM.datePicker.value, []);
-                showToast("Custom puzzle applied!");
-            });
-
-            // Modal 2: Help
-            DOM.btnOpenHelp.addEventListener("click", () => DOM.modalHelp.classList.remove("hidden"));
-            DOM.btnCloseHelp.addEventListener("click", () => DOM.modalHelp.classList.add("hidden"));
-            DOM.btnDismissHelp.addEventListener("click", () => DOM.modalHelp.classList.add("hidden"));
-
-            // Modal 3: Victory
-            DOM.btnCloseVictory.addEventListener("click", () => DOM.modalVictory.classList.add("hidden"));
-            DOM.btnShareResult.addEventListener("click", () => {
-                const shareText = `NYT Letter Boxed (${state.dateStr})\nSolved in ${state.submittedWords.length} words (Par ${state.par})!\nWords: ${state.submittedWords.join(" ➔ ")}`;
-                
-                // Copy to Clipboard
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(shareText);
-                } else {
-                    const tempInput = document.createElement("textarea");
-                    tempInput.value = shareText;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(tempInput);
-                }
-                showToast("Results copied to clipboard!");
-            });
-
-            // Retry proxy button
-            DOM.btnRetryProxy.addEventListener("click", loadPuzzleForSelectedDate);
-        }
-    </script>
+        nextSides.push(val);
+      }
+      if (new Set(nextSides.join("").split("")).size !== 12) {
+        alert("All 12 letters must be unique.");
+        return;
+      }
+      DOM.editModal.classList.remove("open");
+      showProxyStatus("info", "Custom puzzle loaded");
+      applyNewPuzzle(nextSides, state.par, DOM.datePicker.value, []);
+    });
+
+    DOM.datePicker.addEventListener("change", () => {
+      if (DOM.datePicker.value) fetchPuzzleFromWeb(DOM.datePicker.value);
+    });
+
+    DOM.datePicker.value = getTodayISO();
+    renderBoard();
+    fetchPuzzleFromWeb(DOM.datePicker.value);
+  </script>
 </body>
 </html>
