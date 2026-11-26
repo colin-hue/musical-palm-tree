@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -314,71 +314,30 @@
   </style>
 </head>
 <body>
-
-  <div class="top-bar">
-    <input type="date" id="datePicker" class="date-input" />
-    <button class="pill-btn" id="openEditBtn" style="display:none">✎ Preset / Edit</button>
-    <button class="pill-btn" id="hintBtn" style="display:none">💡 Par</button>
-  </div>
-
-  <div class="status-banner status-fetching" id="statusBanner">
-    <span id="statusText">Loading puzzle...</span>
-    <button id="retryBtn">Retry</button>
-  </div>
-
-  <div class="current-word-wrap">
-    <div class="current-word" id="currentWordDisplay"></div>
-    <div class="word-underline"></div>
-  </div>
-
-  <div class="stats-row">
-    <span id="wordCountStat">Words: 0</span>
-    <span>•</span>
-    <span id="letterCountStat">Letters: 0/12</span>
-    <span>•</span>
-    <span id="parStat">Par: 2 words</span>
-  </div>
-
-  <div class="board-stage">
-    <div class="puzzle-box" id="puzzleBox">
-      <svg class="lines-svg" id="linesSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
-    </div>
-  </div>
-
-  <div class="controls-row">
-    <button class="action-btn" id="deleteBtn">⌫ Delete</button>
-    <button class="action-btn primary" id="submitBtn">✓ Submit Word</button>
-    <button class="action-btn" id="undoBtn">↺ Undo</button>
-    <button class="action-btn" id="resetBtn" title="Reset Board">⟳</button>
-  </div>
-
-  <div class="toast" id="toastMsg"></div>
-
-  <div class="history-card">
-    <div class="history-header">
-      <span>SUBMITTED WORDS</span>
-      <span id="historyBadge">0 WORDS</span>
-    </div>
-    <div class="word-chain" id="wordChain">—</div>
-  </div>
-
-  <div class="modal-backdrop" id="editModal">
-    <div class="modal">
-      <h3>Edit 4 Sides (3 letters each)</h3>
-      <div class="side-inputs">
-        <label>Top Side <input type="text" id="side0Input" maxlength="3" /></label>
-        <label>Right Side <input type="text" id="side1Input" maxlength="3" /></label>
-        <label>Bottom Side <input type="text" id="side2Input" maxlength="3" /></label>
-        <label>Left Side <input type="text" id="side3Input" maxlength="3" /></label>
-      </div>
-      <div class="modal-actions">
-        <button class="pill-btn" id="closeModalBtn">Cancel</button>
-        <button class="pill-btn" style="background:#1a1a1b;color:#fff;" id="saveSidesBtn">Apply</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
+<div class="top-bar"><input type="date" id="datePicker" class="date-input"> <button class="pill-btn" id="openEditBtn" style="display: none;">✎ Preset / Edit</button> <button class="pill-btn" id="hintBtn" style="display: none;">💡 Par</button></div>
+<div class="status-banner status-fetching" id="statusBanner"><span id="statusText">Loading puzzle...</span> <button id="retryBtn">Retry</button></div>
+<div class="current-word-wrap">
+<div class="current-word" id="currentWordDisplay"></div>
+<div class="word-underline"></div>
+</div>
+<div class="stats-row"><span id="wordCountStat">Words: 0</span> <span>&bull;</span> <span id="letterCountStat">Letters: 0/12</span> <span>&bull;</span> <span id="parStat">Par: 2 words</span></div>
+<div class="board-stage">
+<div class="puzzle-box" id="puzzleBox"><svg class="lines-svg" id="linesSvg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg></div>
+</div>
+<div class="controls-row"><button class="action-btn" id="deleteBtn">⌫ Delete</button> <button class="action-btn primary" id="submitBtn">✓ Submit Word</button> <button class="action-btn" id="undoBtn">↺ Undo</button> <button class="action-btn" id="resetBtn" title="Reset Board">⟳</button></div>
+<div class="toast" id="toastMsg"></div>
+<div class="history-card">
+<div class="history-header"><span>SUBMITTED WORDS</span> <span id="historyBadge">0 WORDS</span></div>
+<div class="word-chain" id="wordChain">&mdash;</div>
+</div>
+<div class="modal-backdrop" id="editModal">
+<div class="modal">
+<h3>Edit 4 Sides (3 letters each)</h3>
+<div class="side-inputs"><label>Top Side <input type="text" id="side0Input" maxlength="3"></label> <label>Right Side <input type="text" id="side1Input" maxlength="3"></label> <label>Bottom Side <input type="text" id="side2Input" maxlength="3"></label> <label>Left Side <input type="text" id="side3Input" maxlength="3"></label></div>
+<div class="modal-actions"><button class="pill-btn" id="closeModalBtn">Cancel</button> <button class="pill-btn" style="background: #1a1a1b; color: #fff;" id="saveSidesBtn">Apply</button></div>
+</div>
+</div>
+<script>
     const SIDE_COORDS = [
       [{ x: 20, y: 0 }, { x: 50, y: 0 }, { x: 80, y: 0 }],
       [{ x: 100, y: 20 }, { x: 100, y: 50 }, { x: 100, y: 80 }],
@@ -420,6 +379,36 @@
       submittedWords: [],
       currentChain: []
     };
+
+    let dictionarySet = null;
+    let dictionaryReady = false;
+
+    async function loadDictionary() {
+      try {
+        const resp = await fetch("./words.txt", { cache: "default" });
+        if (!resp.ok) {
+          console.warn(`Dictionary fetch returned HTTP ${resp.status}`);
+          return;
+        }
+        const text = await resp.text();
+        const words = text
+          .split(/\r?\n/)
+          .map(w => w.trim().toUpperCase())
+          .filter(w => w.length >= 3 && /^[A-Z]+$/.test(w));
+
+        dictionarySet = new Set(words);
+        dictionaryReady = true;
+        console.log(`Loaded ${dictionarySet.size.toLocaleString()} words from words.txt`);
+      } catch (err) {
+        console.warn("Dictionary unavailable, allowing words without list check:", err);
+      }
+    }
+
+    function isWordInDictionary(word) {
+      // Don't block gameplay if words.txt hasn't finished loading yet or failed offline
+      if (!dictionaryReady || !dictionarySet) return true;
+      return dictionarySet.has(word.toUpperCase());
+    }
 
     function getTodayISO() {
       const now = new Date();
@@ -630,6 +619,13 @@
         showToast("Words must be at least 3 letters long");
         return;
       }
+
+      const candidateWord = state.currentChain.map(idx => getNodeMeta(idx).letter).join("");
+        if (!isWordInDictionary(candidateWord)) {
+          showToast(`"${candidateWord}" is not in word list`);
+          return;
+        }
+
       const lastNodeIdx = state.currentChain[state.currentChain.length - 1];
       state.submittedWords.push([...state.currentChain]);
       state.currentChain = [lastNodeIdx];
@@ -724,6 +720,7 @@
 
     DOM.datePicker.value = getTodayISO();
     renderBoard();
+    loadDictionary();
     fetchPuzzleFromWeb(DOM.datePicker.value);
   </script>
 </body>
